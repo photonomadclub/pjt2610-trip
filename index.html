@@ -488,7 +488,12 @@ function _tryAudioUrl(label, url, timeoutMs){
     var audio = _ttsAudio;
     try{ audio.pause(); }catch(e){}
     var settled = false;
-    function done(fn, arg){ if(settled) return; settled = true; clearTimeout(timer); audio.onerror = null; audio.onplaying = null; fn(arg); }
+    var playAttempted = false;
+    function done(fn, arg){
+      if(settled) return; settled = true; clearTimeout(timer);
+      audio.onerror = null; audio.onplaying = null; audio.oncanplay = null;
+      fn(arg);
+    }
     var timer = setTimeout(function(){
       console.warn('[TTS]', label, 'timed out after', timeoutMs, 'ms');
       try{ audio.pause(); }catch(e){}
@@ -505,16 +510,26 @@ function _tryAudioUrl(label, url, timeoutMs){
       audio.playbackRate = _PLAYBACK_RATE;
       done(resolve, audio);
     };
+    function attemptPlay(){
+      if(playAttempted) return;
+      playAttempted = true;
+      var p = audio.play();
+      if(p && p.catch){
+        p.catch(function(err){
+          console.warn('[TTS]', label, 'play() rejected:', err && err.name, err && err.message);
+          done(reject, new Error((err && (err.name || err.message)) || 'play거부'));
+        });
+      }
+    }
+    // iOS Safari(및 WebKit 기반 iOS 브라우저 전체)는 오디오 소스가 아직 재생 가능한
+    // 상태(readyState)가 되기 전에 play()를 부르면 NotSupportedError로 즉시 거부하는
+    // 경우가 많다 — Chrome/Android는 이걸 알아서 큐에 넣어주지만 Safari는 그렇지 않다.
+    // 그래서 canplay 이벤트를 기다렸다가 재생을 시도한다(이미 준비돼 있으면 곧바로).
+    audio.oncanplay = function(){ attemptPlay(); };
     audio.preload = 'auto';
     audio.src = url;
     audio.load(); // iOS WebKit에서 재사용 중인 <audio>의 src를 바꿀 때 안정적으로 다시 불러오도록 강제
-    var p = audio.play();
-    if(p && p.catch){
-      p.catch(function(err){
-        console.warn('[TTS]', label, 'play() rejected:', err && err.name, err && err.message);
-        done(reject, new Error((err && (err.name || err.message)) || 'play거부'));
-      });
-    }
+    if(audio.readyState >= 3){ attemptPlay(); }
   });
 }
 
@@ -522,6 +537,8 @@ function _setTtsDiag(msg){
   var el = document.getElementById('ttsDiagStamp');
   if(el) el.textContent = msg;
 }
+
+var _lastUtterance = null; // Safari는 이 참조가 재생 도중 가비지컬렉션되면 소리가 끊기는 고질적 버그가 있어 전역에 붙잡아둔다
 
 function _speakFallback(text, lang){
   try{
@@ -535,8 +552,17 @@ function _speakFallback(text, lang){
     u.lang = pick.lang || (_fullLang[lang] || lang);
     u.voice = pick;
     u.rate = _PLAYBACK_RATE;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
+    u.onend = function(){ console.info('[TTS] device voice ended'); if(_lastUtterance === u) _lastUtterance = null; };
+    u.onerror = function(ev){ console.warn('[TTS] device voice 재생 오류:', ev && ev.error); };
+    _lastUtterance = u; // 재생이 끝나기 전에 u가 스코프를 벗어나 GC되는 걸 막는다(iOS/macOS Safari 버그 대응)
+    // Safari는 cancel() 직후 같은 틱에서 speak()를 부르면 새 발화를 조용히 무시하는
+    // 버그가 있다. 뭔가 말하는 중/대기 중일 때만 취소하고, 아주 짧게 텀을 둔 뒤 재생한다.
+    if(window.speechSynthesis.speaking || window.speechSynthesis.pending){
+      window.speechSynthesis.cancel();
+      setTimeout(function(){ window.speechSynthesis.speak(u); }, 60);
+    } else {
+      window.speechSynthesis.speak(u);
+    }
     return true;
   }catch(e){ console.warn('[TTS] fallback threw:', e); return false; }
 }
