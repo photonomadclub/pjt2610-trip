@@ -353,6 +353,7 @@ footer{margin-top:30px;color:#889;font-size:.75rem;text-align:center;}
 <div class="card">
 <h2>🌐 통역 (양방향 대화 모드)</h2>
 <p class="small">① 상대방의 언어를 먼저 선택 → ② 대화 상황에 맞는 마이크를 누르기: 내가 말할 땐 왼쪽 <b>"나(한국어)"</b>, 상대방이 말할 땐 오른쪽 <b>"상대방"</b> 마이크 → ③ 말이 끝나고 잠시 멈추면 자동으로 인식이 종료되며 → ④ 번역 문장과 표준 원어민 발음·억양의 음성이 함께 나오고, 아래 대화 기록에 순서대로 쌓입니다(인터넷 연결 필요). 직접 입력 후 Enter 또는 "변환"으로도 실행할 수 있습니다.</p>
+<p class="small" id="ttsDiagStamp" style="color:#922b21;min-height:1.1em;"></p>
 <div class="trans-box">
 <div class="trans-controls">
 <label class="trans-lang-label" for="transLang">상대방 언어</label>
@@ -486,8 +487,6 @@ function _tryAudioUrl(label, url, timeoutMs){
   return new Promise(function(resolve, reject){
     var audio = _ttsAudio;
     try{ audio.pause(); }catch(e){}
-    audio.src = url;
-    audio.preload = 'auto';
     var settled = false;
     function done(fn, arg){ if(settled) return; settled = true; clearTimeout(timer); audio.onerror = null; audio.onplaying = null; fn(arg); }
     var timer = setTimeout(function(){
@@ -497,22 +496,31 @@ function _tryAudioUrl(label, url, timeoutMs){
     }, timeoutMs);
     audio.onerror = function(){
       var code = audio.error ? audio.error.code : '?';
+      // MediaError 코드: 1=ABORTED 2=NETWORK 3=DECODE 4=SRC_NOT_SUPPORTED
       console.warn('[TTS]', label, 'load/network error, code=', code);
-      done(reject, new Error('load-error'));
+      done(reject, new Error('오류코드' + code));
     };
     audio.onplaying = function(){
       console.info('[TTS]', label, 'playing OK');
       audio.playbackRate = _PLAYBACK_RATE;
       done(resolve, audio);
     };
+    audio.preload = 'auto';
+    audio.src = url;
+    audio.load(); // iOS WebKit에서 재사용 중인 <audio>의 src를 바꿀 때 안정적으로 다시 불러오도록 강제
     var p = audio.play();
     if(p && p.catch){
       p.catch(function(err){
         console.warn('[TTS]', label, 'play() rejected:', err && err.name, err && err.message);
-        done(reject, err);
+        done(reject, new Error((err && (err.name || err.message)) || 'play거부'));
       });
     }
   });
+}
+
+function _setTtsDiag(msg){
+  var el = document.getElementById('ttsDiagStamp');
+  if(el) el.textContent = msg;
 }
 
 function _speakFallback(text, lang){
@@ -550,18 +558,30 @@ function _playTTS(text, lang, btn){
   if(seVoice) attempts.push(['StreamElements(' + seVoice + ')', 'https://api.streamelements.com/kappa/v2/speech?voice=' + seVoice + '&text=' + encodeURIComponent(text)]);
   attempts.push(['GoogleTranslateTTS', 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=' + encodeURIComponent(lang) + '&q=' + encodeURIComponent(text)]);
   console.info('[TTS] click:', text, '(' + lang + ')');
+  var reasons = [];
   (function tryNext(i){
     if(myToken !== _ttsToken) return;
     if(i >= attempts.length){
       console.warn('[TTS] all network tiers failed, trying device voice');
-      if(!_speakFallback(text, lang)) _flashFail(btn);
+      var ok = _speakFallback(text, lang);
+      if(ok){
+        _setTtsDiag('🔈 ' + reasons.join(' · ') + ' → 기기 내장 음성으로 재생');
+      } else {
+        reasons.push('기기 내장 음성(' + lang + ') 사용 불가');
+        _setTtsDiag('🔇 재생 실패 — ' + reasons.join(' · '));
+        _flashFail(btn);
+      }
       return;
     }
     var label = attempts[i][0], url = attempts[i][1];
     _tryAudioUrl(label, url, 5000).then(function(audio){
       if(myToken !== _ttsToken){ try{ audio.pause(); }catch(e){} return; }
       _ttsAudio = audio;
-    }).catch(function(){ tryNext(i+1); });
+      _setTtsDiag('🔈 ' + label + '로 정상 재생');
+    }).catch(function(err){
+      reasons.push(label + '(' + ((err && err.message) || '실패') + ')');
+      tryNext(i+1);
+    });
   })(0);
 }
 
