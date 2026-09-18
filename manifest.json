@@ -1,0 +1,17 @@
+{
+  "name": "PJT 2610 유럽 여행 일정표",
+  "short_name": "유럽여행2610",
+  "description": "파리-돌로미티-베로나-빈 12일 여행 일정표, 여행회화, 양방향 통역 도구",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f7fa",
+  "theme_color": "#1a5276",
+  "lang": "ko",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}

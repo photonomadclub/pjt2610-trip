@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PJT 2610 유럽 여행 일정표</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a5276">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="유럽여행2610">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{--brand:#1a5276;--accent:#e67e22;--bg:#f5f7fa;--card:#ffffff;--line:#dde3ea;--warn:#c0392b;--good:#1e8449;--info:#2874a6;--danger:#922b21;}
+*{box-sizing:border-box;}
+body{font-family:'Noto Sans KR','Segoe UI',-apple-system,'Malgun Gothic',sans-serif;background:var(--bg);margin:0;color:#222;line-height:1.6;}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 16px 70px;}
+h1{font-size:1.55rem;color:var(--brand);margin:0 0 4px;}
+.subtitle{color:#667;font-size:.92rem;margin-bottom:18px;}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px;position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:10;border-bottom:1px solid var(--line);}
+.tab-btn{border:1px solid var(--line);background:#fff;border-radius:20px;padding:8px 14px;font-size:.83rem;cursor:pointer;color:#456;white-space:nowrap;}
+.tab-btn.active{background:var(--brand);color:#fff;border-color:var(--brand);}
+.day-panel{display:none;}
+.day-panel.active{display:block;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:18px;}
+.card h2{margin-top:0;color:var(--brand);font-size:1.2rem;border-bottom:2px solid var(--brand);padding-bottom:8px;}
+.card h3{color:#2c3e50;font-size:1.02rem;margin:16px 0 8px;}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:10px;}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top;}
+th{background:#eef3f8;color:#234;}
+table.sched td.t{white-space:nowrap;font-weight:600;color:var(--brand);width:78px;}
+.kt{font-weight:400;color:#8a95a3;font-size:.72rem;margin-top:2px;}
+.hist{font-size:.78rem;color:#6b4f22;background:#fdf6e6;border-left:3px solid #cf9d3f;padding:6px 10px;margin-top:5px;border-radius:4px;}
+a.extlink{color:var(--brand);text-decoration:underline;}
+.phrase-table td{vertical-align:middle;}
+.spk{border:none;background:#eef3f8;color:var(--brand);border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:.9rem;}
+.spk:hover{background:var(--brand);color:#fff;}
+.emerg-table td{font-size:.85rem;}
+.trans-box{display:flex;flex-direction:column;gap:10px;max-width:560px;}
+.trans-box textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.92rem;font-family:inherit;resize:vertical;}
+.trans-box textarea:focus{outline:2px solid var(--brand);outline-offset:1px;}
+.trans-controls{display:flex;gap:8px;align-items:center;}
+.trans-controls select{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;background:#fff;}
+.trans-go{background:var(--brand);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:.9rem;font-weight:600;cursor:pointer;}
+.trans-go:hover{background:var(--accent);}
+.trans-go:disabled{opacity:.6;cursor:default;}
+.trans-output{background:#eef6ff;border-radius:8px;padding:12px 14px;font-size:1rem;min-height:24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#234;}
+.trans-hint{font-size:.78rem;color:#889;}
+.trans-input-row{display:flex;gap:8px;align-items:stretch;}
+.trans-input-row textarea{flex:1;}
+.mic-btn{border:none;background:#eef3f8;color:var(--brand);border-radius:50%;width:46px;height:46px;font-size:1.15rem;cursor:pointer;flex-shrink:0;}
+.mic-btn:hover{background:var(--brand);color:#fff;}
+.mic-btn:disabled{opacity:.45;cursor:not-allowed;}
+.mic-btn.listening{background:#e74c3c;color:#fff;animation:micPulse 1.1s infinite;}
+@keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(231,76,60,.5);}70%{box-shadow:0 0 0 12px rgba(231,76,60,0);}100%{box-shadow:0 0 0 0 rgba(231,76,60,0);}}
+.lang-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 14px;padding-top:18px;border-top:1px solid var(--line);}
+.lang-tab-btn{border:1px solid var(--line);background:#fff;color:#234;border-radius:20px;padding:7px 16px;font-size:.85rem;cursor:pointer;}
+.lang-tab-btn:hover{border-color:var(--brand);}
+.lang-tab-btn.active{background:var(--brand);color:#fff;border-color:var(--brand);}
+.lang-panel{display:none;}
+.lang-panel.active{display:block;}
+.trans-lang-label{font-size:.85rem;color:#556;font-weight:600;}
+.dialog-mics{display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 0 4px;}
+.dialog-mic-btn{display:flex;flex-direction:column;align-items:center;gap:5px;border:2px solid var(--line);background:#fff;border-radius:14px;padding:14px 22px;cursor:pointer;min-width:130px;}
+.dialog-mic-btn:hover{border-color:var(--brand);}
+.dialog-mic-btn:disabled{opacity:.45;cursor:not-allowed;}
+.dialog-mic-icon{font-size:1.7rem;}
+.dialog-mic-label{font-size:.8rem;color:#234;font-weight:700;}
+.dialog-mic-btn.listening{border-color:#e74c3c;background:#fdf1ee;animation:micPulse 1.1s infinite;}
+.dialog-arrow{font-size:1.3rem;color:#889;}
+.trans-clear{background:none;border:1px solid var(--line);color:#667;border-radius:8px;padding:9px 14px;font-size:.82rem;cursor:pointer;}
+.trans-clear:hover{border-color:var(--brand);color:var(--brand);}
+.trans-log{display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto;}
+.trans-log-entry{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;}
+.trans-log-entry.me{border-left:3px solid var(--brand);}
+.trans-log-entry.other{border-left:3px solid #cf9d3f;}
+.trans-log-speaker{font-size:.7rem;color:#889;font-weight:700;margin-bottom:4px;letter-spacing:.02em;}
+.trans-log-orig{font-size:.85rem;color:#556;margin-bottom:4px;}
+.trans-log-translated{font-size:1rem;color:#1a5276;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.sun-table td,.sun-table th{text-align:center;}
+.wx-cond{color:var(--accent);font-weight:600;}
+#wxUpdatedStamp{color:#889;}
+.daymeta{background:#eef6ff;border-radius:8px;padding:8px 12px;font-size:.85rem;color:#234;margin-bottom:12px;display:inline-block;}
+.brief{background:#fbfaf5;border:1px dashed #d3c199;border-radius:8px;padding:10px 16px;margin-bottom:14px;font-size:.87rem;}
+.brief ul{margin:6px 0 0;padding-left:20px;}
+.alert{border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.87rem;}
+.alert.info{background:#eaf3fb;border-left:4px solid var(--info);}
+.alert.warn{background:#fdf1ee;border-left:4px solid var(--warn);}
+.alert.good{background:#eafaf0;border-left:4px solid var(--good);}
+.memo{font-size:.78rem;color:#556;background:#f5f6f8;border-left:3px solid #b7c3d0;padding:6px 10px;margin-top:5px;border-radius:4px;}
+.memo.warn{border-left-color:var(--warn);color:#7b241c;background:#fdf1ee;}
+.memo.danger{border-left-color:var(--danger);color:#641e16;background:#fce8e6;font-weight:500;}
+.memo.good{border-left-color:var(--good);color:#1d6b3e;background:#eafaf0;}
+.memo.info{border-left-color:var(--info);color:#1b4f72;background:#eaf3fb;}
+a.maploc{color:var(--brand);text-decoration:none;border-bottom:1px dotted var(--brand);font-weight:600;}
+a.maploc:hover{color:var(--accent);}
+.foodbox{background:#fff8ec;border:1px solid #f0d9a8;border-radius:8px;padding:12px 16px;margin-top:10px;font-size:.85rem;}
+.foodbox ul{margin:6px 0;padding-left:20px;}
+.pill{display:inline-block;background:#1a5276;color:#fff;border-radius:12px;padding:2px 10px;font-size:.75rem;margin-right:6px;}
+footer{margin-top:30px;color:#889;font-size:.75rem;text-align:center;}
+.small{font-size:.8rem;color:#667;}
+@media (max-width:640px){.tabs{position:static;} table.sched{font-size:.78rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🌍 유럽 트레킹 &amp; 도시 여행 일정표 (2026.10.1 ~ 10.12)</h1>
+<div class="subtitle">인천 → 파리 → 폴리나·트레치메·오르티세이·발디푸네스(돌로미티) → 베로나 → 빈 → 인천 · 12일 일정</div>
+<div class="tabs">
+<button class="tab-btn active" data-tab="dsum">일정요약</button>
+<button class="tab-btn" data-tab="d1">Day1 · 10/1(목) 출국</button>
+<button class="tab-btn" data-tab="d2">Day2 · 10/2(금) 파리</button>
+<button class="tab-btn" data-tab="d3">Day3 · 10/3(토) 파리</button>
+<button class="tab-btn" data-tab="d4">Day4 · 10/4(일) 파리</button>
+<button class="tab-btn" data-tab="d5">Day5 · 10/5(월) 파리→폴리나</button>
+<button class="tab-btn" data-tab="d6">Day6 · 10/6(화) 트레치메</button>
+<button class="tab-btn" data-tab="d7">Day7 · 10/7(수) 오르티세이</button>
+<button class="tab-btn" data-tab="d8">Day8 · 10/8(목) 베로나</button>
+<button class="tab-btn" data-tab="d9">Day9 · 10/9(금) 베로나→빈</button>
+<button class="tab-btn" data-tab="d10">Day10 · 10/10(토) 빈</button>
+<button class="tab-btn" data-tab="d11">Day11 · 10/11(일) 빈→출국</button>
+<button class="tab-btn" data-tab="d12">Day12 · 10/12(월) 귀국</button>
+<button class="tab-btn" data-tab="trans">🌐 통역</button>
+<button class="tab-btn" data-tab="emerg">🆘 긴급연락처</button>
+
+</div>
+<div id="dsum" class="day-panel active">
+
+<div class="card">
+<h2>① 종합 일정표 · 국가/도시별 일출·일몰·실시간 날씨</h2>
+<p class="small">※ 최고/최저기온과 날씨상태는 페이지를 열 때 자동으로 <b>실시간 예보(Open-Meteo)</b>를 불러와 갱신을 시도합니다. 출발일까지 16일 이내인 날짜만 실시간 반영되며, 그보다 먼 날짜는 2026년 9월 중순 시점 확장예보·평년 climate 자료를 종합한 <b>사전 예상치</b>가 표시됩니다(여행일이 다가올수록 자동으로 더 정확한 값으로 바뀝니다). 일출·일몰은 각 지역 좌표 기준 정밀 계산값(오차 ±1분 이내)이라 항상 정확합니다.</p>
+<p class="small" id="wxUpdatedStamp">날씨 정보를 불러오는 중…</p>
+<button id="wxRefreshBtn" type="button" class="trans-clear" style="margin-bottom:10px;">🔄 날씨 지금 다시 불러오기</button>
+<table class="sun-table"><thead><tr><th>구분</th><th>날짜</th><th>지역/국가</th><th>주요 일정</th><th>일출</th><th>일몰</th><th>날씨</th><th>최고(℃)</th><th>최저(℃)</th></tr></thead><tbody><tr><td><b>Day1</b></td><td>10/1(목)</td><td>한국→네덜란드(경유)</td><td style="text-align:left">인천공항 출국 → KL0856 야간비행 → AMS 새벽 환승<br><span class="small">인천 기준(출국일)</span></td><td>06:29</td><td>18:17</td><td><span id="wxCondM-d1-0" class="wx-cond">·</span></td><td><span id="wxTempHi-d1-0">21</span></td><td><span id="wxTempLo-d1-0">16</span></td></tr><tr><td><b>Day2</b></td><td>10/2(금)</td><td>프랑스 파리</td><td style="text-align:left">AMS→CDG 도착, 파리 도심 명소(오페라·개선문·에펠탑 외경)</td><td>07:51</td><td>19:27</td><td><span id="wxCondM-d2-0" class="wx-cond">·</span></td><td><span id="wxTempHi-d2-0">19</span></td><td><span id="wxTempLo-d2-0">11</span></td></tr><tr><td><b>Day3</b></td><td>10/3(토)</td><td>프랑스 파리</td><td style="text-align:left">오르세·앵발리드·로댕·에펠탑 전망대·몽마르트르</td><td>07:53</td><td>19:25</td><td><span id="wxCondM-d3-0" class="wx-cond">·</span></td><td><span id="wxTempHi-d3-0">19</span></td><td><span id="wxTempLo-d3-0">11</span></td></tr><tr><td><b>Day4</b></td><td>10/4(일)</td><td>프랑스 파리</td><td style="text-align:left">루브르·마레지구·생트샤펠·팡테옹·노트르담</td><td>07:54</td><td>19:23</td><td><span id="wxCondM-d4-0" class="wx-cond">·</span></td><td><span id="wxTempHi-d4-0">20</span></td><td><span id="wxTempLo-d4-0">11</span></td></tr><tr><td><b>Day5</b></td><td>10/5(월)</td><td>파리→베네치아→폴리나</td><td style="text-align:left">오페라 가르니에 → ORY→VCE 비행 → 렌트카 → 폴리나</td><td>07:56 / 07:15</td><td>19:21 / 18:43</td><td><span id="wxCondM-d5-0" class="wx-cond">·</span> / <span id="wxCondM-d5-1" class="wx-cond">·</span></td><td><span id="wxTempHi-d5-0">21</span> / <span id="wxTempHi-d5-1">23</span></td><td><span id="wxTempLo-d5-0">11</span> / <span id="wxTempLo-d5-1">10</span></td></tr><tr><td><b>Day6</b></td><td>10/6(화)</td><td>폴리나→트레치메→오르티세이</td><td style="text-align:left">폴리나 수도원 → 트레치메 디 라바레도 트레킹 → 브라이에스 호수 → 오르티세이<br><span class="small">2,333m 고지대라 체감은 표기값보다 5~10℃ 더 낮고 바람도 강함</span></td><td>07:16 / 07:18</td><td>18:42 / 18:43</td><td><span id="wxCondM-d6-0" class="wx-cond">·</span> / <span id="wxCondM-d6-1" class="wx-cond">·</span></td><td><span id="wxTempHi-d6-0">16</span> / <span id="wxTempHi-d6-1">11</span></td><td><span id="wxTempLo-d6-0">4</span> / <span id="wxTempLo-d6-1">-3</span></td></tr><tr><td><b>Day7</b></td><td>10/7(수)</td><td>오르티세이·발디푸네스</td><td style="text-align:left">알페디시우시·세체다 케이블카 트레킹, 발디푸네스 성당 마을<br><span class="small">알페디시우시·세체다 고산지대는 최저 -3~0℃까지 가능</span></td><td>07:19</td><td>18:41</td><td><span id="wxCondM-d7-0" class="wx-cond">·</span></td><td><span id="wxTempHi-d7-0">14</span></td><td><span id="wxTempLo-d7-0">-2</span></td></tr><tr><td><b>Day8</b></td><td>10/8(목)</td><td>오르티세이→리모네→베로나</td><td style="text-align:left">가르다 호수(리모네) 경유 → 베로나 도착, 아레나·줄리엣의집·산피에트로성</td><td>07:24 / 07:23</td><td>18:43 / 18:43</td><td><span id="wxCondM-d8-0" class="wx-cond">·</span> / <span id="wxCondM-d8-1" class="wx-cond">·</span></td><td><span id="wxTempHi-d8-0">16</span> / <span id="wxTempHi-d8-1">19</span></td><td><span id="wxTempLo-d8-0">8</span> / <span id="wxTempLo-d8-1">9</span></td></tr><tr><td><b>Day9</b></td><td>10/9(금)</td><td>베로나→베네치아→빈</td><td style="text-align:left">카스텔베키오 → VCE 반납 → OS544 비행 → 빈 도착, 슈테판대성당</td><td>07:24 / 07:05</td><td>18:41 / 18:17</td><td><span id="wxCondM-d9-0" class="wx-cond">·</span> / <span id="wxCondM-d9-1" class="wx-cond">·</span></td><td><span id="wxTempHi-d9-0">18</span> / <span id="wxTempHi-d9-1">20</span></td><td><span id="wxTempLo-d9-0">10</span> / <span id="wxTempLo-d9-1">6</span></td></tr><tr><td><b>Day10</b></td><td>10/10(토)</td><td>오스트리아 빈</td><td style="text-align:left">호프부르크·시시미술관·벨베데레궁전·카를성당</td><td>07:06</td><td>18:15</td><td><span id="wxCondM-d10-0" class="wx-cond">·</span></td><td><span id="wxTempHi-d10-0">19</span></td><td><span id="wxTempLo-d10-0">6</span></td></tr><tr><td><b>Day11</b></td><td>10/11(일)</td><td>빈→인천(기내)</td><td style="text-align:left">왕궁정원·미술사박물관 → KE938 야간비행 출발<br><span class="small">빈 기준(출국일)</span></td><td>07:08</td><td>18:13</td><td><span id="wxCondM-d11-0" class="wx-cond">·</span></td><td><span id="wxTempHi-d11-0">20</span></td><td><span id="wxTempLo-d11-0">6</span></td></tr><tr><td><b>Day12</b></td><td>10/12(월)</td><td>대한민국 인천</td><td style="text-align:left">12:30 ICN 착륙(한국시각), 입국심사·수하물·귀가<br><span class="small">인천 기준(귀국일)</span></td><td>06:39</td><td>18:01</td><td><span id="wxCondM-d12-0" class="wx-cond">·</span></td><td><span id="wxTempHi-d12-0">22</span></td><td><span id="wxTempLo-d12-0">13</span></td></tr></tbody></table>
+<p class="small">※ 산악 지대(트레치메 아우론조 2,333m·세체다 2,500m·알페디시우시 2,000m대)는 해발고도가 높아 계곡 마을 기온보다 체감상 5~10℃ 더 낮고, 바람이 강해 실제 체감온도는 표기값보다 훨씬 낮을 수 있음. 방한 장비(③ 참조) 필수 지참. 실시간 날씨는 인터넷 연결이 필요하며, 연결이 안 되면 자동으로 사전 예상치가 유지됩니다.</p>
+</div>
+
+<div class="card">
+<h2>② 여행 전체 사전예약 체크리스트</h2>
+<table>
+<thead><tr><th style="width:26%">항목</th><th>세부 내용</th></tr></thead>
+<tbody>
+<tr><td>항공권 5구간</td><td>KL0856(ICN→AMS) · KL1405(AMS→CDG) · EJU4873(ORY→VCE) · OS544(VCE→VIE) · KE938(VIE→ICN) e-티켓 확정본 인쇄/캡처</td></tr>
+<tr><td>렌트카 &amp; 운전</td><td>국제운전면허증 발급, 렌트카 예약 확정서, 톨게이트(텔레패스) 이용방법 사전 숙지, 유럽 내 통행료·주차 규정 확인</td></tr>
+<tr><td><a class="maploc" href="https://maps.app.goo.gl/VG6sbkgdjzT5DCPM7" target="_blank" rel="noopener">아우론조 산장 주차장(Parcheggio Auronzo)</a></td><td>트레치메 진입 필수 관문. 사전 QR 예약 없이는 진입 불가(성수기 조기 마감) — <b>예약 시 입력한 렌트카 번호판 정보가 실제 인수 차량과 일치하는지 반드시 재확인</b></td></tr>
+<tr><td><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Seceda+cable+car+Ortisei" target="_blank" rel="noopener">세체다 케이블카</a></td><td>오르티세이↔푸르네스↔세체다 왕복 통합권 €74, 모바일 티켓 사전구매</td></tr>
+<tr><td>숙소 5곳</td><td><a class="maploc" href="https://maps.app.goo.gl/vi7RuWbLsy7BVPN77" target="_blank" rel="noopener">호텔 채링 크로스(파리)</a> · <a class="maploc" href="https://maps.app.goo.gl/f4gPQzDxbgH6rTWs9" target="_blank" rel="noopener">Agriturismo Memento(폴리나)</a> · <a class="maploc" href="https://maps.app.goo.gl/1XbX4jsv4cw4U6FT6" target="_blank" rel="noopener">호텔 빌라 에밀리아(오르티세이)</a> · <a class="maploc" href="https://maps.app.goo.gl/Red8iEinNnhSf6vL9" target="_blank" rel="noopener">Corso Porta Nuova 39(베로나)</a> · <a class="maploc" href="https://maps.app.goo.gl/bC6YHXjFnSmsi1CR8" target="_blank" rel="noopener">그라벤 호텔(빈)</a> 바우처 전체 출력</td></tr>
+<tr><td><a class="maploc" href="https://maps.app.goo.gl/3EgKFJpSfnQ9Zuwi7" target="_blank" rel="noopener">피그뮐러</a> 슈니첼</td><td>10/9 저녁 예약 완료</td></tr>
+<tr><td>교통패스</td><td>파리 나비고(Navigo) 패스 구매</td></tr>
+<tr><td>기타 필수</td><td>여행자보험, 유심/이심(로밍), 국제운전면허증, 신용카드 해외결제 알림 설정</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>③ 트레킹 · 방한 장비 체크리스트</h2>
+<p class="small">대상 구간: 트레치메 디 라바레도(아우론조~로카텔리 왕복 약 8km, 최고 2,333m), 세체다·알페디시우시 케이블카 트레킹, 발디푸네스 산책</p>
+<table>
+<thead><tr><th style="width:26%">분류</th><th>품목</th></tr></thead>
+<tbody>
+<tr><td>신발/하의</td><td>방수 등산화(길들인 것), 등산양말(여벌 포함), 방풍 트레킹 팬츠</td></tr>
+<tr><td>보온</td><td>경량 다운/플리스 내피, 방풍·방수 쉘 자켓, 보온모자, 장갑, 버프/넥워머</td></tr>
+<tr><td>안전/보조</td><td>트레킹폴(2단 접이식), 무릎보호대(로카텔리→라바레도 급경사 내리막 대비), 헤드랜턴, 발목 지지용 테이핑</td></tr>
+<tr><td>자외선/피부</td><td>고산 자외선 대비 선글라스, 선크림(SPF50+), 립밤</td></tr>
+<tr><td>기타 장비</td><td>배낭(20~30L), 접이식 우산/우비, 보온물통, 보조배터리</td></tr>
+<tr><td>행동식</td><td>초콜릿바·견과류·에너지젤, 상비약(진통제/파스/밴드), 손난로</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>④ 항공편 마스터 표</h2>
+<table>
+<thead><tr><th>구간</th><th>일자</th><th>편명</th><th>출발</th><th>보딩</th><th>이륙</th><th>도착</th><th>착륙</th></tr></thead>
+<tbody>
+<tr><td>인천→암스테르담</td><td>10/1(목)</td><td>KL0856</td><td><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Incheon+International+Airport+Terminal+1" target="_blank" rel="noopener">인천공항 제1터미널</a></td><td>22:00</td><td>22:25</td><td><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Amsterdam+Schiphol+Airport" target="_blank" rel="noopener">암스테르담 스히폴공항</a></td><td>익일 05:10</td></tr>
+<tr><td>암스테르담→파리</td><td>10/2(금)</td><td>KL1405</td><td>AMS</td><td>08:00</td><td>08:10</td><td><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Paris+Charles+de+Gaulle+Airport" target="_blank" rel="noopener">파리 샤를드골공항</a></td><td>09:30</td></tr>
+<tr><td>파리→베네치아</td><td>10/5(월)</td><td>EJU4873</td><td><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Paris+Orly+Airport+Terminal+1" target="_blank" rel="noopener">파리 오를리공항 T1</a></td><td>14:00</td><td>14:10</td><td><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Venice+Marco+Polo+Airport" target="_blank" rel="noopener">베네치아 마르코폴로공항</a></td><td>15:50</td></tr>
+<tr><td>베네치아→빈</td><td>10/9(금)</td><td>OS544</td><td>VCE</td><td>14:30</td><td>14:35</td><td><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Vienna+International+Airport" target="_blank" rel="noopener">빈 국제공항 T3</a></td><td>15:40</td></tr>
+<tr><td>빈→인천</td><td>10/11(일)</td><td>KE938</td><td>VIE</td><td>18:30</td><td>19:00</td><td><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Incheon+International+Airport+Terminal+2" target="_blank" rel="noopener">인천공항 제2터미널</a></td><td>익일 12:30</td></tr>
+</tbody>
+</table>
+<p class="small">※ 모든 시간은 각 구간 현지시각 기준. 탑승 최소 2~3시간 전 공항 도착 권장, 렌터카 반납/톨게이트 정산 시간 별도 확보.</p>
+</div>
+
+<div class="card">
+<h2>⑤ 즉석 한식 식사 트래커 &amp; 한국 식재료 준비 가이드</h2>
+<table>
+<thead><tr><th>일자</th><th>끼니</th><th>장소</th><th>비고</th></tr></thead>
+<tbody>
+<tr><td>Day4 · 10/4(일)</td><td>석식 20:30</td><td>파리 숙소</td><td>루브르·노트르담 일정 후 호텔 복귀 취식</td></tr>
+<tr><td>Day5 · 10/5(월)</td><td>석식 18:30</td><td>Agriturismo Memento(폴리나)</td><td>이동일 도착 직후</td></tr>
+<tr><td>Day6 · 10/6(화)</td><td>석식 20:00</td><td>호텔 빌라 에밀리아(오르티세이)</td><td>트레치메 트레킹 종료 후</td></tr>
+<tr><td>Day7 · 10/7(수)</td><td>석식 19:30</td><td>오르티세이 숙소</td><td>발디푸네스 일정 후</td></tr>
+<tr><td>Day8 · 10/8(목)</td><td>중식 14:00</td><td>베로나 숙소 체크인 직후</td><td>엑셀 원본상 '중식'이나 즉석한식으로 진행</td></tr>
+<tr><td>Day10 · 10/10(토)</td><td>석식 18:00</td><td>빈 숙소</td><td>18:00까지 호텔 복귀해 취식(카를성당 일정 전 조정 완료)</td></tr>
+</tbody>
+</table>
+<p class="small"><b>총 6회</b>(석식 5회 + 중식 1회) · 성인 2인 기준 준비 가이드 — 1인 1식 기준 <b>총 12인분</b>이 필요하며, 예비분(항공 결항/컨디션 대비) 2~3식분을 추가해 <b>14~15인분</b> 분량 준비를 권장합니다.</p>
+<div class="foodbox">
+<b>🍚 기내 반입/위탁 가능한 휴대용 한식 유형 목록</b>
+<ul>
+<li><b>즉석밥류</b>: 공장밥(전자레인지/끓는물 중탕 겸용 파우치형) — 12~15개(예비 포함)</li>
+<li><b>즉석 국·찌개류(레토르트)</b>: 된장찌개, 순두부찌개, 미역국, 소고기무국 파우치 — 6~8개</li>
+<li><b>3분 요리류</b>: 3분카레, 3분짜장, 미트볼, 함박스테이크 — 4~6개(아이 없어도 간편식으로 유용)</li>
+<li><b>진공포장 밑반찬</b>: 멸치볶음, 진미채무침, 장조림, 김자반, 어묵볶음, 장아찌류 — 각 1~2팩씩 다양하게</li>
+<li><b>조미김/스낵김</b>: 소포장 낱개형 다수(밥 반찬 겸 간식용)</li>
+<li><b>컵밥·컵누들·사발면</b>: 공항 대기·비상용 여분 4~6개</li>
+<li><b>소포장 장류</b>: 고추장, 쌈장, 튜브고추장 — 위탁수하물에 파손 방지 포장</li>
+<li><b>기타</b>: 즉석 누룽지/죽(비상식), 일회용 수저/젓가락, 물끓임용 전기포트는 대부분 숙소 비치(미비치 시 컵라면용 소형 전열기 고려)</li>
+</ul>
+<p class="small" style="margin-top:8px">※ 액체·젤류 및 발열도시락(자체발열팩)은 기내 반입 제한이 있을 수 있으므로 위탁수하물에 넣거나 가급적 건조식·상온보관 제품 위주로 구성 권장.</p>
+</div>
+</div>
+
+</div>
+
+<div id="d1" class="day-panel">
+<div class="card">
+<h2>Day1 · 10/1(목) 인천 출국 → 야간비행 → 암스테르담(AMS) 경유</h2>
+<div class="daymeta" data-wx-day="d1">🌅 일출 06:29 · 🌇 일몰 18:17 · 🌡️ <span id="wxCond-d1-0" class="wx-cond"></span><span id="wxTemp-d1-0" class="wx-temp">예상 21/16°C</span> · 인천 기준(출국일)</div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>여권 유효기간(6개월 이상)·e-티켓·숙소 바우처 전체 출력/캡처 재확인</li><li>위탁수하물 규정 확인 — 트레킹 장비(폴, 아이젠 등 뾰족한 물건)는 위탁수하물로</li><li>환전 및 유심/이심(로밍) 개통, 국제운전면허증 소지 확인</li><li>첫 야간비행 대비 목베개·수면안대·수면양말 준비</li></ul></div>
+<div class="alert info">✈️ <b>항공편 안내</b><br><b>KL0856</b> 인천(ICN) T1 → 암스테르담(AMS) · 보딩 22:00 / 이륙 22:25 · 익일 랜딩 05:10(현지시각) · 총 비행 약 12시간 소요</div>
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">19:30<div class="kt">(유럽 12:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Incheon+International+Airport+Terminal+1" target="_blank" rel="noopener">인천공항 제1터미널</a> 도착 및 수속 준비</td></tr><tr><td class="t">20:00<div class="kt">(유럽 13:00)</div></td><td class="p">출국심사</td></tr><tr><td class="t">21:00<div class="kt">(유럽 14:00)</div></td><td class="p">출국장 대기</td></tr><tr><td class="t">22:00<div class="kt">(유럽 15:00)</div></td><td class="p">KL0856 보딩 / 22:25 이륙 (인천 → 암스테르담)</td></tr><tr><td class="t">22:30<div class="kt">(유럽 15:30)</div></td><td class="p">항로이동 (기내, 야간비행 시작 · 기내식 후 취침 권장)</td></tr><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p"><span class="pill">유럽시각 10/1</span> 항로이동 계속 (시차 -7시간 적용)</td></tr><tr><td class="t">05:00<div class="kt">(한국 12:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Amsterdam+Schiphol+Airport" target="_blank" rel="noopener">암스테르담 스히폴공항(AMS)</a> 랜딩(05:10착)</td></tr><tr><td class="t">05:30<div class="kt">(한국 12:30)</div></td><td class="p">환승 이동 — AMS 내 파리행 국내선 게이트로 이동, 경유 대기</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d2" class="day-panel">
+<div class="card">
+<h2>Day2 · 10/2(금) 파리 도착 & 파리 1일차 (오페라 지구 ~ 에펠탑 야경)</h2>
+<div class="daymeta" data-wx-day="d2">🌅 일출 07:51 · 🌇 일몰 19:27 · 🌡️ <span id="wxCond-d2-0" class="wx-cond"></span><span id="wxTemp-d2-0" class="wx-temp">예상 19/11°C</span></div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>소매치기 다발 구간(RER A, 개선문 주변, 트로카데로) 사전 숙지</li><li>에펠탑 앞 일몰(19:29) 타이밍에 맞춰 동선 여유있게 진행</li><li>나비고 패스 개통 후 전 구간 대중교통 활용</li></ul></div>
+<div class="alert info">✈️ <b>항공편 안내</b><br><b>KL1405</b> 암스테르담(AMS) → 파리 샤를드골(CDG) · 보딩 08:00 / 이륙 08:10 · 랜딩 09:30</div>
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">휴식 / 티타임 (AMS 라운지·게이트 대기)</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">출국장 대기</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p">KL1405 보딩 / 08:10 이륙 (암스테르담 → 파리 CDG)</td></tr><tr><td class="t">09:30<div class="kt">(한국 16:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Paris+Charles+de+Gaulle+Airport" target="_blank" rel="noopener">파리 샤를드골공항(CDG)</a> 랜딩(09:30착)</td></tr><tr><td class="t">10:00<div class="kt">(한국 17:00)</div></td><td class="p"><a class="extlink" href="https://blog.naver.com/sunnyjumma/224386045214" target="_blank" rel="noopener">입국심사</a> / 나비고(Navigo) 교통패스 구매</td></tr><tr><td class="t">10:30<div class="kt">(한국 17:30)</div></td><td class="p">숙소 이동(우버) → <a class="maploc" href="https://maps.app.goo.gl/vi7RuWbLsy7BVPN77" target="_blank" rel="noopener">호텔 채링 크로스</a><div class="memo info">주소: 39 rue Pasquier, 8구(샹젤리제 인근), 75008 파리, 프랑스</div></td></tr><tr><td class="t">11:00<div class="kt">(한국 18:00)</div></td><td class="p">러기지 스토리지</td></tr><tr><td class="t">11:30<div class="kt">(한국 18:30)</div></td><td class="p">도보 이동</td></tr><tr><td class="t">12:00<div class="kt">(한국 19:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Galeries+Lafayette+Haussmann+Paris" target="_blank" rel="noopener">라파예트 오스만 백화점</a><div class="memo warn">옥상에서 파리 전경·에펠탑 원경 무료 조망 가능. <b>주의</b>: 에스컬레이터 혼잡구간·옥상 포토존에서 가방을 바닥에 내려두지 말 것(순식간 도난 다발)</div><div class="hist">📜 1912년 테오필 바데르가 문을 연 파리 최대 백화점으로, 조르주 셰달이 설계한 화려한 네오비잔틴 양식의 스테인드글라스 돔(1912)이 상징. 벨 에포크 시대 소비문화의 정점을 보여주는 건축으로 꼽히며, 매년 크리스마스 시즌 대형 트리 장식으로도 유명. 다양한 영화·화보 촬영지로 활용되어 왔다. 1894년 테오필 바데르와 사촌 알퐁스 칸이 오스만 대로 모퉁이의 작은 잡화점을 연 것이 라파예트의 시작이었다. 1919년에는 조종사 쥘 베드린이 백화점 옥상에 비행기를 착륙시켜 파리를 떠들썩하게 한 일화가 있다. 1940년 나치 점령기에는 유대인 창업주 일가와 유대인 직원들이 강제로 쫓겨나고 경영권을 빼앗기는 이른바 "아리안화"를 겪었다. 1922년부터는 "라 메트리즈"라는 자체 공방을 운영해 가구·직물을 생산했고, 1962년에는 신인 디자이너 소니아 리키엘을 세상에 알린 곳이기도 하다.</div></td></tr><tr><td class="t">12:30<div class="kt">(한국 19:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Place+Vend%C3%B4me+Paris" target="_blank" rel="noopener">방돔광장</a><div class="hist">📜 1698년 루이 14세를 기리기 위해 조성된 8각형 광장으로, 중앙의 방돔 기둥(1810)은 나폴레옹이 아우스터리츠 전투 승리를 기념해 세웠다. 세계 최고급 보석상들이 모인 곳이자 리츠 파리 호텔(1898)이 위치해 쇼팽이 1849년 이곳에서 생을 마감했고, 다이애나 왕세자비도 사고 직전 마지막으로 머물렀던 장소. 광장은 원래 "정복 광장"으로 계획되었다가 이후 "루이 르 그랑 광장"으로 이름이 바뀌었다. 1720년에는 스코틀랜드 출신 금융가 존 로가 이곳에 저택을 짓고 미시시피 회사 주식 투기를 주도했으나 버블이 터지며 파산했다. 중앙에 있던 루이 14세 기마상은 지라르동의 작품으로 근대 최초의 일체 주조 대형 기마상으로 알려졌으나 혁명 때 파괴되어 소형 복제품만 루브르에 남아 있다. 1871년 파리 코뮌 당시 화가 귀스타브 쿠르베가 방돔 기둥 철거를 주도했고, 훗날 재건 비용을 배상하라는 판결을 받자 이를 감당하지 못해 스위스로 망명했다가 1877년 그곳에서 사망했다. 트라야누스 기둥을 본뜬 이 기둥은 아우스터리츠에서 노획한 대포를 녹여 만든 것으로 알려져 있다.</div></td></tr><tr><td class="t">13:00<div class="kt">(한국 20:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=%C3%89glise+de+la+Madeleine+Paris" target="_blank" rel="noopener">마들렌 성당</a><div class="hist">📜 나폴레옹이 자신의 군대를 기리는 신전으로 짓도록 명령해 1764년 착공, 1842년 그리스 신전 양식으로 완공되었다. 52개의 코린트식 기둥이 둘러싼 외관이 특징이며, 내부에는 조각가 카를로 마로케티의 작품들이 전시. 1849년 쇼팽의 장례식이 이곳에서 거행되었다. 건축가 피에르 비뇽은 나폴레옹이 직접 낙점한 인물로, 1828년 그가 사망하자 자크마리 위베가 뒤를 이어 외벽 장식을 마무리했다. 혁명기와 이후에는 도서관·무도회장·시장, 심지어 파리 최초의 기차역으로 개조하자는 제안까지 나왔으나 모두 무산되었다. 앙리 드 트리케티가 기베르티의 피렌체 세례당 문을 참고해 만든 청동 정문은 바티칸 성 베드로 대성전의 문보다 크다. 내부는 창문이 하나도 없이 세 개의 돔에 뚫린 천창으로만 빛이 드는 독특한 구조다. 1849년 쇼팽 장례식 때는 전례상 성가대석에 여성이 설 수 없어, 여성 합창단원들이 검은 벨벳 커튼 뒤에 숨어 노래해야 했다.</div></td></tr><tr><td class="t">13:30<div class="kt">(한국 20:30)</div></td><td class="p">카페 휴식(간단 점심)</td></tr><tr><td class="t">14:00<div class="kt">(한국 21:00)</div></td><td class="p">지하철 이동 — <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Gare+Auber+Paris" target="_blank" rel="noopener">Auber역</a> → RER A선(1정거장) → <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Charles+de+Gaulle+Etoile+RER+Station+Paris" target="_blank" rel="noopener">Charles de Gaulle–Etoile역</a> 하차<div class="memo danger"><b>위험</b>: RER A선 환승 통로·문 주변은 출퇴근 외 시간에도 조직적 소매치기 밀집 구간. 가방을 앞으로 메고 사수할 것. 개찰구 통과 시 뒤에 바짝 붙어 무단승차하려는 인원은 단호히 밀어낼 것</div></td></tr><tr><td class="t">14:30<div class="kt">(한국 21:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Arc+de+Triomphe+Paris" target="_blank" rel="noopener">에투알 개선문</a><div class="memo good">예약 불필요, 지하 통로로 진입 후 계단 이동. <b>안전</b>: 유료 구역인 전망대 위는 매우 안전. 단 지상 로터리 주변 가짜 설문조사 집시단은 "No"로 단호히 거절</div><div class="hist">📜 나폴레옹이 1806년 아우스터리츠 전투 승리를 기념해 명령했으나 정작 완공은 1836년, 그의 사후였다. 1840년 세인트헬레나에서 옮겨진 나폴레옹의 관이 이 문을 통과해 앵발리드로 향했다. 1920년부터 제1차 세계대전 무명용사의 묘가 안치되어 매일 저녁 추모의 불꽃이 켜지며, 12개 대로가 별 모양으로 뻗어나가는 구조가 장관을 이룬다. 건축가 장 샬그랭은 완공을 보지 못한 채 1811년 사망했고, 이후 여러 건축가가 차례로 공사를 이어받았다. 내벽에는 장교 수백 명의 이름과 수많은 전투명이 새겨져 있다. 1916년 베르됭 전투 개전일에 아치의 조각상이 쥐고 있던 칼이 부러져 떨어지자 당국이 불길한 징조로 여겨 급히 천으로 가린 일화가 있다. 1919년에는 조종사 샤를 고드프루아가 복엽기를 몰고 아치 밑을 통과하는 곡예비행을 감행했으며 그 영상은 당국에 의해 상영 금지되었다. 흥미롭게도 1940년 히틀러와 1944년 드골 모두 개선문 밑을 직접 통과하지 않고 무명용사의 묘를 예우하며 옆으로 돌아갔다.</div></td></tr><tr><td class="t">16:00<div class="kt">(한국 23:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Avenue+des+Champs-%C3%89lys%C3%A9es+Paris" target="_blank" rel="noopener">샹젤리제 거리</a> 산책<div class="memo warn">개선문 → 콩코르드 방향 약 1.9km 도보. <b>주의</b>: 전 세계 인파로 혼잡, 명품매장 대기줄 근처 미행 소매치기 경계</div><div class="hist">📜 "세상에서 가장 아름다운 거리"로 불리며 1670년대 조경가 앙드레 르노트르가 튈르리 정원의 연장으로 설계했다. "샹젤리제"는 그리스 신화의 낙원 "엘리시온 평원"에서 유래한 이름. 매년 7월 14일 프랑스 혁명 기념일과 투르 드 프랑스 결승선 행사가 열리는 국가적 상징 거리이기도 하다. 원래 이 일대는 파리 성벽 밖의 늪지대로, 오물이 흘러드는 악취 나는 습지였던 곳에 "엘리제(낙원)"라는 반어적인 이름이 붙었다는 이야기가 전해진다. 이름이 정착되기 전에는 여러 명칭으로 불렸고, 처음엔 대로 하단 일부 구역만을 가리키다 혁명 이후 대로 전체를 지칭하게 되었다. 지금과 같은 가로수길·가스등·분수 형태로 정비된 것은 의외로 늦은 1834년 무렵으로, 콩코르드 광장 분수를 설계한 것과 같은 건축가 이토르프가 이 작업을 맡았다.</div></td></tr><tr><td class="t">17:00<div class="kt">(한국 익일 00:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Pont+de+la+Concorde+Paris" target="_blank" rel="noopener">콩코르드 다리</a> & 부르봉궁<div class="memo warn">부르봉 궁전(하원)은 내부 관람 불가, 다리 위에서 외관 배경 촬영. <b>주의</b>: 가짜 금반지를 주웠다며 접근하는 "링 트릭" 사기 무시하고 지나칠 것</div><div class="hist">📜 콩코르드 광장은 1793년 루이 16세와 마리 앙투아네트가 단두대에서 처형된 자리로, 프랑스 혁명 당시 약 1,300명이 이곳에서 처형되었다. 광장 중앙의 오벨리스크는 1836년 이집트 총독이 선물한 3,300년 된 룩소르 신전 유물. 콩코르드 다리(1791년 완공)는 바스티유 감옥의 돌을 재활용해 지어졌다는 이야기로도 유명하다. 광장은 처음엔 루이 15세의 쾌유를 기념해 "루이 15세 광장"으로 불렸고, 혁명기엔 "혁명 광장", 1795년엔 화합의 뜻을 담아 "콩코르드"로, 왕정복고기엔 다시 이름이 뒤바뀌는 등 정치적 격변에 따라 여러 차례 개칭되었다. 샹젤리제 쪽 입구의 "마를리의 말" 조각상은 원래 루이 14세의 마를리 성을 장식하던 작품을 옮겨온 것이다. 광장의 두 대형 분수(1836~1840)는 건축가 이토르프가 로마 나보나 광장과 성 베드로 광장 분수를 연구해 설계했다. 오벨리스크에 대한 답례로 프랑스가 이집트 카이로 성채에 시계탑을 선물했다는 이야기가 널리 알려져 있으나, 실제로는 무관하게 별도로 전달된 선물이라는 반박도 있으며, 그 시계는 수십 년간 고장 난 채 방치되다 2021년에야 복원되었다.</div></td></tr><tr><td class="t">17:30<div class="kt">(한국 익일 00:30)</div></td><td class="p">버스 이동 — <a class="maploc" href="https://maps.app.goo.gl/WSKtcQyqZQmke39AA" target="_blank" rel="noopener">Pont de la Concorde정류장</a> → 63번 버스(8개 정류장) → <a class="maploc" href="https://maps.app.goo.gl/JhECjfpVjKbVNSm69" target="_blank" rel="noopener">Trocadéro정류장</a> 하차<div class="memo warn">알렉상드르 3세 다리·앵발리드 전경 편안하게 감상. <b>안전</b>: 메트로보다 버스가 상대적으로 안전하나 승하차 문 근처 밀집 시 소지품 주의</div></td></tr><tr><td class="t">18:00<div class="kt">(한국 익일 01:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Trocad%C3%A9ro+Paris" target="_blank" rel="noopener">샤이오궁 / 트로카데로</a><div class="memo danger">에펠탑이 가장 멋지게 나오는 명소, 일몰 전 매직아워 촬영 명당. <b>위험</b>: 에펠탑 모형 열쇠고리 강매하는 노점상 밀집 — 눈길 주지 말고 "노 땡큐" 후 이동</div><div class="hist">📜 1937년 파리 만국박람회를 위해 지어진 샤이오궁은 두 개의 곡선형 날개 건물이 특징이며, 현재 인류박물관과 건축박물관이 자리한다. "트로카데로"라는 이름은 1823년 스페인 트로카데로 요새 전투 승리에서 유래. 제2차 세계대전 중 1940년 히틀러가 이곳에서 에펠탑을 배경으로 사진을 찍은 장소로도 알려져 있다. 이 언덕에는 17세기 왕비가 세운 수녀원이 있었으나 혁명기에 파괴되었고, 나폴레옹은 아들을 위한 "로마왕 궁전" 건립을 명했으나 실현되지 못했다. 지금의 샤이오궁 이전에는 1878년 만국박람회를 위해 지어진 "트로카데로 궁"이 있었으나 노후화로 1937년 철거되고 현 건물로 대체되었다. 1948년 12월에는 이곳에서 유엔 총회가 세계인권선언을 채택했다. 제2차 세계대전 중에는 궁 안 인류박물관을 거점으로 저항조직이 결성돼 지하신문을 발행했으나 조직원 다수가 체포되어 처형되었다.</div></td></tr><tr><td class="t">18:30<div class="kt">(한국 익일 01:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Champ+de+Mars+Paris" target="_blank" rel="noopener">마르스 광장</a><div class="memo danger">Pont d'Iéna 경유 도보 20분. 19:29 일몰에 맞춰 에펠탑 아래 잔디광장에서 노을·첫 점등 감상. <b>위험</b>: 사진 찍는 틈에 가방을 통째로 들고 튀는 절도 다수 발생 — 가방은 몸 앞쪽으로</div><div class="hist">📜 로마 전쟁의 신 "마르스"의 이름을 딴 이 부지는 원래 군사학교(1751)의 열병 연병장으로 조성되었다. 1789년 프랑스 혁명 1주년 기념식이, 1889년과 1900년 만국박람회 주 행사장이 이곳에서 열렸다. 에펠탑(1889)이 바로 그 1889년 박람회의 출입 관문으로 세워진 구조물이다. 1791년에는 루이 16세의 폐위를 요구하는 청원 서명 인파를 향해 국민방위대가 발포한 "샹드마르스 학살"이 벌어져 다수가 목숨을 잃었고, 이 사건으로 혁명 영웅이던 라파예트는 정치적으로 몰락했다. 1783년에는 물리학자 자크 샤를이 이곳에서 세계 최초의 수소 기구를 띄웠는데, 인근에 착륙한 기구를 괴물로 오인한 농민들이 쇠스랑으로 찢어버린 일화로도 유명하다. 옆에 자리한 군사학교는 건축가 앙주자크 가브리엘이 설계했으며, 훗날 나폴레옹이 이곳에서 포병 생도로 교육받았다.</div></td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p">도보 이동 → <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Manna+Korean+Restaurant+Paris" target="_blank" rel="noopener">만나식당(파리)</a><div class="memo warn"><b>주의</b>: 야간 골목 진입 시 오토바이 날치기 조심, 스마트폰은 차도 반대편 손으로 쥘 것</div></td></tr><tr><td class="t">20:00<div class="kt">(한국 익일 03:00)</div></td><td class="p">석식 / 만나식당</td></tr><tr><td class="t">21:30<div class="kt">(한국 익일 04:30)</div></td><td class="p">지하철 이동 — <a class="maploc" href="https://maps.app.goo.gl/zsTJWJvm3NCoYfZc8" target="_blank" rel="noopener">Commerce역</a> → M8선(6개 역) → Madeleine역<div class="memo warn"><b>주의</b>: 밤 9시 이후 역 내 구걸·취객 발견 시 눈 마주치지 말고 거리 둘 것</div></td></tr><tr><td class="t">22:00<div class="kt">(한국 익일 05:00)</div></td><td class="p">숙소 도착 (정비 / 사전 짐정리) — <a class="maploc" href="https://maps.app.goo.gl/vi7RuWbLsy7BVPN77" target="_blank" rel="noopener">호텔 채링 크로스</a></td></tr><tr><td class="t">23:00<div class="kt">(한국 익일 06:00)</div></td><td class="p">취침 (7H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d3" class="day-panel">
+<div class="card">
+<h2>Day3 · 10/3(토) 파리 2일차 (오르세 · 앵발리드 · 에펠탑 · 몽마르트르)</h2>
+<div class="daymeta" data-wx-day="d3">🌅 일출 07:53 · 🌇 일몰 19:25 · 🌡️ <span id="wxCond-d3-0" class="wx-cond"></span><span id="wxTemp-d3-0" class="wx-temp">예상 19/11°C</span></div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>에펠탑 Top 전망대 예약 티켓·신분증 지참</li><li>몽마르트르 언덕 강매 대응 요령 숙지</li></ul></div>
+
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">호텔 조식</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p">외출 준비</td></tr><tr><td class="t">08:30<div class="kt">(한국 15:30)</div></td><td class="p">지하철 이동 — 숙소 → <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=48.87552784083755,2.3270309015639676" target="_blank" rel="noopener">Saint-Lazare역</a> → M12선(Mairie d’Issy 방면 3개 역) → <a class="maploc" href="https://maps.app.goo.gl/zX7NWQvhvBbvhPYj6" target="_blank" rel="noopener">Assemblée Nationale역</a></td></tr><tr><td class="t">09:00<div class="kt">(한국 16:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Mus%C3%A9e+d%E2%80%99Orsay+Paris" target="_blank" rel="noopener">오르세 미술관</a><div class="memo warn"><b>2026년 최신 정책: 뮤지엄패스 소지자도 시간대 지정 예약 필수.</b> 고흐·모네 등 인상파 거장 집중 투어. <b>주의</b>: 시계탑 포토존 등 혼잡 스팟에서 밀착하며 주머니를 터는 2인조 조심</div><div class="hist">📜 1900년 파리 만국박람회에 맞춰 개통한 오를레앙 철도의 종착역 "오르세역"이었으나, 열차 플랫폼이 짧아 1939년 교외선으로 격하된 뒤 폐역 위기를 넘기고 1986년 미술관으로 재탄생했다. 거대한 아르누보 시계와 유리 천장이 옛 기차역의 흔적. 고흐의 <자화상>, 모네의 <수련>, 밀레의 <이삭줍기> 등 인상주의·후기인상주의 걸작 컬렉션으로 세계 최고 수준을 자랑한다. 기차역 시절 정식 설계자는 건축가 빅토르 랄루였으며, 서쪽 부속 건물에는 대형 호텔이 있어 1958년 드골이 이곳 연회장에서 정계 복귀를 알리는 기자회견을 열기도 했다. 폐역 이후 제2차 세계대전 중에는 포로에게 보낼 소포를 발송하는 우체국으로, 종전 후에는 귀환 포로 수용소로 쓰였다. 1960년대 모더니즘 건축가들이 호텔·공항으로 재건축하자며 철거를 주장했으나 1973년 역사기념물로 지정되며 살아남았고, 그 사이 오손 웰스의 영화 <심판>(1962) 촬영지로도 쓰였다.</div></td></tr><tr><td class="t">11:30<div class="kt">(한국 18:30)</div></td><td class="p">도보 이동(약 12분)</td></tr><tr><td class="t">12:00<div class="kt">(한국 19:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Les+Invalides+Paris" target="_blank" rel="noopener">앵발리드(나폴레옹 묘)</a><div class="memo info">군사박물관 및 돔 성당 내부 나폴레옹 황금 묘 관람. <b>보통</b>: 광장 진입로에서 설문 서명을 요구하며 접근하는 시선 분산책 무시</div><div class="hist">📜 1670년 루이 14세가 상이군인 요양시설로 건립을 명해 1676년 완공했다. 황금빛 돔(1706~1708년 도금)이 파리 스카이라인의 랜드마크이며, 1840년 세인트헬레나에서 옮겨온 나폴레옹의 유해가 6겹의 관에 담겨 돔 성당 지하에 안치되어 있다. 현재는 프랑스 최대 규모의 군사박물관을 겸하고 있다. 나폴레옹의 관은 러시아 카렐리아산 자주색 석영암으로 만들어졌으며, 받침대에는 여러 채석장에서 가져온 서로 다른 돌이 쓰였다. 관을 둘러싼 원형 회랑에는 승리의 여신상 12기가 늘어서 있고, 대형 부조들이 나폴레옹 법전 제정 등 업적을 새기고 있다. 지하묘에는 나폴레옹의 아들이자 "로마왕"으로 불린 나폴레옹 2세의 관과 형제 조제프·제롬 보나파르트의 무덤도 함께 있다. 입구 위에는 "센강가, 내가 그토록 사랑한 프랑스 국민 곁에 묻히기를 바란다"는 나폴레옹의 유언이 새겨져 있다.</div></td></tr><tr><td class="t">12:30<div class="kt">(한국 19:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Mus%C3%A9e+Rodin+Paris" target="_blank" rel="noopener">로댕 미술관</a><div class="memo info">앵발리드 바로 옆, '생각하는 사람' 등 야외 정원 조각상 중심 속성 관람</div><div class="hist">📜 18세기 저택 "호텔 비롱"에서 1908년부터 로댕이 말년을 보내며 작업실로 사용했고, 그의 사후 1919년 미술관으로 개관했다. 정원에 전시된 청동 조각 <생각하는 사람>(1904)은 단테의 신곡에서 영감을 받은 작품이며, <지옥의 문>·<칼레의 시민> 등 로댕의 대표작과 그의 연인이자 제자였던 카미유 클로델의 작품도 함께 전시되어 있다. 호텔 비롱은 로댕이 입주하기 전 한때 여학교로 쓰였다가 황폐해진 뒤, 값싼 임대료 덕분에 마티스·장 콕토·이사도라 덩컨과 로댕의 비서였던 시인 라이너 마리아 릴케 등이 함께 세 들어 살던 예술가 공동 주택이었다. 마티스는 이 저택의 옛 성당 공간을 화실 삼아 그림을 가르쳤다. 로댕의 연인 카미유 클로델은 이후 정신질환 진단을 받아 가족에 의해 정신병원에 강제 입원되었고, 1913년부터 사망한 1943년까지 30년간 그곳을 벗어나지 못했다.</div></td></tr><tr><td class="t">13:30<div class="kt">(한국 20:30)</div></td><td class="p">중식 / <a class="maploc" href="https://maps.app.goo.gl/p6LL4B6zKnw78ghC9" target="_blank" rel="noopener">만나식당</a></td></tr><tr><td class="t">14:30<div class="kt">(한국 21:30)</div></td><td class="p">도보 이동 — <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Eiffel+Tower+Paris" target="_blank" rel="noopener">에펠탑</a><div class="memo info">주말 오후 마르스 광장은 유동인구 절정 — 소지품 수시 확인</div></td></tr><tr><td class="t">15:00<div class="kt">(한국 22:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Eiffel+Tower+Paris" target="_blank" rel="noopener">에펠탑</a><div class="memo good">보안검색 2회 통과. <b>안전(우수)</b>: 검문이 철저해 파리에서 치안이 가장 우수한 곳</div><div class="hist">📜 1889년 프랑스 혁명 100주년 만국박람회의 상징물로 귀스타브 에펠이 설계, 당대 최고층(324m) 건축물로 완공되었다. 당시 모파상·뒤마 등 예술가 300명이 "파리의 흉물"이라며 반대 서명을 했으나, 20년 임시 존치 예정이던 철탑은 무선통신탑으로 가치를 인정받아 철거를 면했다. 매시 정각 5분간 22,000개 조명이 반짝이는 "스파클링 쇼"가 1985년부터 이어지고 있다. 탑 3층에는 에펠이 개인 서재 겸 응접실로 쓰던 비밀 아파트가 있었는데, 거액을 제시하며 하룻밤 묵기를 청한 이들의 요청도 모두 거절하고 소수의 학계 인사만 초대했다. 발명가 토머스 에디슨이 이곳을 찾아와 자신이 만든 축음기를 선물했다는 일화가 유명하며, 지금도 당시 가구와 밀랍인형이 재현돼 있다. 실제 기초 설계는 에펠 소속 기술자들이 그렸고 건축가 스테판 소베스트르가 장식적 아치와 외관을 다듬은 것으로, 에펠은 자금 조달과 시공을 주도한 사업가에 가까웠다. 탑 아래에는 에펠이 직접 만든 풍동 실험실이 있어 항공역학 연구에도 활용됐다.</div></td></tr><tr><td class="t">17:30<div class="kt">(한국 익일 00:30)</div></td><td class="p">우버 이동 — <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Basilique+du+Sacr%C3%A9-C%C5%93ur+Paris" target="_blank" rel="noopener">사크레쾨르 대성당</a><div class="memo danger"><b>위험</b>: 2호선 바르베(Barbès)~앙베르 구간(도보 대체시 경유 가능)은 소매치기범 주 활동무대로 알려짐 — 이동 중에도 가방을 안고 소지품 유의</div></td></tr><tr><td class="t">18:00<div class="kt">(한국 익일 01:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Basilique+du+Sacr%C3%A9-C%C5%93ur+Paris" target="_blank" rel="noopener">사크레쾨르 대성당</a> / 야경<div class="memo danger">19:26 일몰에 맞춰 언덕 정상에서 파리 야경·에펠탑 조망. <b>위험(강매 최고조)</b>: 언덕 계단에서 실팔찌를 강제로 묶고 돈을 요구하는 무리 다수 — 양손을 주머니에 넣고 쳐다보지 말고 통과</div><div class="hist">📜 1870~71년 보불전쟁 패배와 파리코뮌의 유혈사태를 속죄하기 위해 1875년 착공, 1914년 완공(축성은 1919년)된 로마-비잔틴 양식 성당. 몽마르트르("순교자의 산") 언덕 130m 정상에 위치해 새하얀 트라베르틴 석회암 외벽이 비와 시간이 지날수록 더 하얗게 변하는 특성을 지녔다. 내부 돔은 유럽 최대급 모자이크화 <영광의 그리스도>로 장식되어 있다. 종탑에는 프랑스 최대 종 "라 사부아야드"가 걸려 있는데, 1895년 주조된 무게 18.8톤의 종으로 사부아 지방 여러 교구가 기증했다. 지하 크립트에는 예수 성심의 유해로 여겨지는 성물이 보관돼 있고, 정면 계단 양옆에는 잔 다르크와 성왕 루이 9세의 청동 기마상이 서 있다. 설계를 맡은 건축가 폴 아바디는 1894년 세상을 떠나 완공을 보지 못했고 이후 뤼시앵 마뉴가 공사를 이어받았다. 돔 전망대에 오르면 맑은 날 멀리 라데팡스까지 한눈에 들어온다.</div></td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Place+du+Tertre+Paris" target="_blank" rel="noopener">몽마르트르 · 테르트르 광장</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Le+Mur+des+Je+t%E2%80%99aime+Paris" target="_blank" rel="noopener">사랑해 벽</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Moulin+Rouge+Paris" target="_blank" rel="noopener">물랭루주</a> — 중간 석식(간편식)<div class="memo warn">테르트르 광장 밤 정취, 사랑해 벽 야간 촬영. <b>주의</b>: 동의 없이 캐리커처를 그리고 €50 이상을 요구하는 사기 단호히 거절</div><div class="hist">📜 테르트르 광장은 19세기 말~20세기 초 피카소·모딜리아니·반 고흐·달리 등 가난한 예술가들이 모여 살며 작업하던 예술촌으로, 지금도 거리 화가들이 즉석 초상화를 그린다. 인근 "사랑해 벽"(2000년, 프레데릭 바롱 작)은 311개 언어로 "사랑해"가 쓰인 타일 벽화. 물랭루주(1889년 개업)는 캉캉 춤의 발상지로 앙리 드 툴루즈로트레크의 포스터 작품으로 세계적으로 알려졌다. 몽마르트르 언덕은 1871년 파리코뮌이 촉발된 현장이기도 한데, 정부군이 언덕 꼭대기의 대포를 회수하려 하자 주민과 국민방위대가 저항하며 봉기가 시작됐다. 1881년 화가 로돌프 살리가 몽마르트르 최초의 카바레 "검은 고양이"를 열며 보헤미안 예술가들의 아지트가 형성됐다. "사랑해 벽"은 캘리그래퍼 클레르 키토가 프레데릭 바롱이 수집한 표현들을 손글씨로 옮겨 수백 개의 에나멜 타일에 새긴 것으로, 곳곳의 붉은 얼룩은 깨진 마음의 조각을 상징한다. 물랭루주의 붉은 풍차는 실제 제분용이 아니라 화가 아돌프 윌레트가 디자인한 장식물로, 1915년 화재로 소실된 뒤 1925년 지금 모습으로 재건됐다.</div></td></tr><tr><td class="t">21:30<div class="kt">(한국 익일 04:30)</div></td><td class="p">버스 이동 — <a class="maploc" href="https://maps.app.goo.gl/hnS5vpq5MgTJe13P9" target="_blank" rel="noopener">Place de Clichy - Caulaincourt정류장</a> → 80번 버스(5개 정류장)</td></tr><tr><td class="t">22:00<div class="kt">(한국 익일 05:00)</div></td><td class="p">숙소 도착 (정비 / 사전 짐정리) — <a class="maploc" href="https://maps.app.goo.gl/vi7RuWbLsy7BVPN77" target="_blank" rel="noopener">호텔 채링 크로스</a></td></tr><tr><td class="t">23:00<div class="kt">(한국 익일 06:00)</div></td><td class="p">취침 (7H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d4" class="day-panel">
+<div class="card">
+<h2>Day4 · 10/4(일) 파리 3일차 (루브르 · 마레지구 · 시테섬 · 노트르담)</h2>
+<div class="daymeta" data-wx-day="d4">🌅 일출 07:54 · 🌇 일몰 19:23 · 🌡️ <span id="wxCond-d4-0" class="wx-cond"></span><span id="wxTemp-d4-0" class="wx-temp">예상 20/11°C</span></div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>일요일 오전 루브르 오픈런 전략 — 지하 통로 이용해 대기줄 우회</li><li>생트샤펠·콩시에르주리·팡테옹 최종입장 시간(17:15 등) 엄수</li><li>오늘 저녁은 첫 즉석 한식(20:30, 숙소) — 조리도구·재료 위치 미리 확인</li></ul></div>
+
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">호텔 조식</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p">버스 이동 — <a class="maploc" href="https://maps.app.goo.gl/JQtJxw3xvuJYXiU87" target="_blank" rel="noopener">Gare Saint-Lazare - Havre정류장</a> → 95번 버스(7개 정류장) → <a class="maploc" href="https://maps.app.goo.gl/neCrXAuE154XBcnP8" target="_blank" rel="noopener">Musée du Louvre정류장</a></td></tr><tr><td class="t">08:30<div class="kt">(한국 15:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Louvre+Museum+Paris" target="_blank" rel="noopener">루브르박물관</a><div class="memo danger">일요일 오전 오픈 공략, 지하 통로로 진입 시 피라미드 외부 대기줄 우회 가능. <b>위험(소매치기 소굴)</b>: 모나리자 앞은 방어막 필수 — 밀집 촬영 순간 백팩·주머니를 통째로 털어감</div><div class="hist">📜 12세기 말 필리프 2세가 요새로 지은 것이 시초로, 16세기 프랑수아 1세 때 왕궁으로 개축되며 다빈치의 <모나리자>를 처음 소장했다. 1793년 프랑스 혁명 정부가 왕실 컬렉션을 일반에 공개하며 박물관으로 전환. 1989년 중국계 건축가 이오 밍 페이가 설계한 유리 피라미드가 논란 끝에 준공되어 지금은 루브르의 상징이 되었다. <밀로의 비너스>, <사모트라케의 니케> 등 인류사 최고 걸작들을 소장. 1911년 이탈리아 출신 미술관 직원 빈첸초 페루자가 <모나리자>를 훔쳐 2년간 자택에 숨겨두었던 도난 사건이 오히려 이 그림을 세계 최고의 유명작으로 만드는 계기가 되었다. 나폴레옹 시대에는 정복지에서 약탈한 미술품으로 소장품을 채워 한때 "나폴레옹 박물관"으로 불렸으나, 1815년 워털루 패전 후 상당수가 원소유국에 반환되었다. 1980년대 유리 피라미드 건설을 위한 발굴 중 필리프 2세가 쌓은 12세기 성채의 원형 탑 기초가 지하에서 발견되어 지금도 전시되어 있다. 실제로 설치된 유리 패널은 673장으로, 한때 떠돌던 "666장 저주설"은 근거 없는 낭설로 밝혀졌다.</div></td></tr><tr><td class="t">11:30<div class="kt">(한국 18:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Jardin+des+Tuileries+Paris" target="_blank" rel="noopener">튈르리 정원</a><div class="memo warn">초록 철제 의자에서 분수대 감상. <b>주의</b>: 가짜 금반지 "링 트릭" 사기 무시</div><div class="hist">📜 1564년 카트린 드 메디시스가 이탈리아 정원 양식을 본떠 조성한 프랑스 최초의 공공정원 중 하나로, 1667년 조경가 앙드레 르노트르가 좌우대칭의 프랑스식 정원으로 재설계했다. "튈르리"라는 이름은 이 부지에 있던 기와(tuile) 공장에서 유래. 로댕의 <키스>, 자코메티, 마욜 등 현대 조각가들의 야외 작품이 곳곳에 전시되어 있다. 1792년 상퀼로트 군중이 튈르리 궁전을 습격해 왕을 지키던 스위스 근위대 수백 명이 학살당한 사건은 프랑스 왕정 몰락의 결정적 계기가 되었다. 1871년 파리 코뮌 봉기 당시 코뮌군이 궁전에 불을 질러 사흘간 불탔고 이후 재건되지 않아, 현재 정원 자리에는 궁전 흔적이 남아있지 않다. 정원 서쪽 끝의 오랑주리 미술관은 원래 오렌지 나무를 겨울에 보관하던 온실이었으나 1927년부터 모네의 대형 연작 <수련>을 상설 전시하는 공간으로 바뀌었다.</div></td></tr><tr><td class="t">12:00<div class="kt">(한국 19:00)</div></td><td class="p">지하철 이동 — <a class="maploc" href="https://maps.app.goo.gl/zH8YkUnAZsFUKWqf6" target="_blank" rel="noopener">Concorde역</a> → M1선(Château de Vincennes 방면 5개 역) → <a class="maploc" href="https://maps.app.goo.gl/yM8Fpfhwq84H8kfu9" target="_blank" rel="noopener">Hôtel de Ville역</a></td></tr><tr><td class="t">12:30<div class="kt">(한국 19:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Le+Marais+Paris" target="_blank" rel="noopener">마레지구</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Mus%C3%A9e+Carnavalet+Paris" target="_blank" rel="noopener">카르나발레 박물관</a><div class="memo warn">유대인지구 골목(호시에) 도보 통과, 바스티유 광장 촬영. <b>주의</b>: 일요일 마레지구는 인파 정체가 심함 — 몸을 부딪치며 접근하는 3인조 소매치기 조심</div><div class="hist">📜 "마레(Marais)"는 프랑스어로 "습지"라는 뜻으로, 13세기 templar 기사단이 개간하며 파리 귀족 저택가로 발전했다. 17세기 보주 광장을 중심으로 번성했다가 혁명 이후 쇠락, 20세기 후반 재개발되며 지금은 유대인 지구(호시에 거리)와 LGBTQ 문화의 중심지로 부활했다. 카르나발레 박물관(1880년 개관)은 파리 역사 전체를 다루는 시립박물관으로, 프랑스 혁명 관련 유물이 특히 풍부하다. 1559년 앙리 2세가 마상시합 중 눈에 창 파편을 맞아 숨진 곳이 바로 훗날 보주 광장이 들어선 자리였다. 보주 광장 6번지는 빅토르 위고가 16년간 실제로 거주하며 <레미제라블> 일부를 집필한 집으로, 현재 위고 박물관으로 쓰인다. 카르나발레 박물관 건물 자체가 16세기 르네상스 저택이며, 한때 서간문학의 대가 세비녜 부인이 살았던 곳이기도 하다. 나치 점령기 로시에 거리 일대 유대인 주민 다수가 강제 이송되었고, 오늘날 거리 곳곳의 동판이 그 흔적을 기록하고 있다.</div></td></tr><tr><td class="t">13:30<div class="kt">(한국 20:30)</div></td><td class="p">중식 / 현지식 — <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=L%E2%80%99As+du+Fallafel+Paris" target="_blank" rel="noopener">라스 뒤 팔라펠</a><div class="memo good"><b>안전</b>: 테이크아웃 취식 시 가방 지퍼 상시 확인</div></td></tr><tr><td class="t">14:30<div class="kt">(한국 21:30)</div></td><td class="p">버스 이동 — <a class="maploc" href="https://maps.app.goo.gl/bxgnjTVz5wfcwxEc9" target="_blank" rel="noopener">Académie du Climat정류장</a> → 96번 버스(3개 정류장) → <a class="maploc" href="https://maps.app.goo.gl/JfatpTKSeZ2tyWzZ9" target="_blank" rel="noopener">Cité - Palais de Justice정류장</a> 하차</td></tr><tr><td class="t">15:00<div class="kt">(한국 22:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Sainte-Chapelle+Paris" target="_blank" rel="noopener">생트샤펠</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Conciergerie+Paris" target="_blank" rel="noopener">콩시에르주리</a><div class="memo good">중세 고딕 스테인드글라스의 정점(생트샤펠)과 마리 앙투아네트 감금지(콩시에르주리) 연속 관람, 최종입장 시간 엄수. <b>안전(우수)</b>: 파리 최고재판소와 나란히 붙어 있어 경찰 병력 삼엄, 매우 안전</div><div class="hist">📜 생트샤펠은 1248년 루이 9세(성왕 루이)가 예수의 가시관 등 성유물을 보관하기 위해 단 7년 만에 지은 고딕 예배당으로, 15m 높이의 스테인드글라스 1,113장이 성경 1,113개 장면을 담고 있다. 콩시에르주리는 원래 왕궁이었으나 혁명기 감옥으로 쓰였고, 1793년 마리 앙투아네트가 처형 전 37일간 갇혔던 독방이 보존되어 있다. 루이 9세는 가시관 성유물을 콘스탄티노플 라틴제국 황제로부터 거액을 주고 사들였는데, 예배당 건축비보다도 더 비쌌다는 이야기가 전해진다. 정작 생트샤펠을 설계한 건축가는 공식 기록이 남아있지 않아 확정되지 않았다. "콩시에르주리"라는 이름은 왕궁을 관리하던 왕실 관리 "콩시에르주"의 관저였던 데서 유래했다. 공포정치 생존자와 희생자 유족들은 1795년경 "희생자의 무도회"를 열어 기요틴을 연상시키듯 목덜미를 드러낸 헤어스타일과 붉은 리본을 목에 두르는 유행을 만들어냈다.</div></td></tr><tr><td class="t"></td><td class="p">버스 이동 — <a class="maploc" href="https://maps.app.goo.gl/HsmxpfmyVf3wNePX7" target="_blank" rel="noopener">Cité - Parvis Notre-Dame정류장</a> → 75번 버스(3개 정류장) → <a class="maploc" href="https://maps.app.goo.gl/uLqzP29w4nRmJzrg6" target="_blank" rel="noopener">Panthéon정류장</a></td></tr><tr><td class="t">16:00<div class="kt">(한국 23:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Panth%C3%A9on+Paris" target="_blank" rel="noopener">팡테옹</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=%C3%89glise+Saint-%C3%89tienne-du-Mont+Paris" target="_blank" rel="noopener">생 에티엔 뒤 몽</a><div class="memo warn">최종입장 17:15 엄수. 소르본 대학 외관을 지나 팡테옹·생 에티엔 뒤 몽 성당 관람. <b>보통</b>: 라틴지구는 비교적 안전하나 광장 계단 혼잡 시 소매치기 주의</div><div class="hist">📜 원래 루이 15세가 병에서 회복한 것을 감사하며 생트 준비에브 성녀에게 바친 성당으로 1791년 완공되었으나, 프랑스 혁명 직후 국가 영웅들의 묘지 "팡테옹"으로 용도가 바뀌었다. 볼테르, 루소, 빅토르 위고, 에밀 졸라, 퀴리 부부 등이 안장되어 있으며, 1851년 물리학자 푸코가 지구 자전을 증명한 진자 실험을 이곳 돔 아래에서 시연했다. 완공 직후 돔을 떠받치는 기둥에서 균열이 발견되어 1806년 기둥을 두꺼운 벽체로 보강해야 했고, 이 때문에 원래 건축가 수플로가 의도했던 밝고 가벼운 느낌이 상당히 사라졌다. 원칙적으로 1789년 혁명 이후 사망자만 안장 대상이지만, 볼테르와 루소는 예외로 별도 제작한 관에 안장되었다. 2009년 사르코지 대통령이 좌파 작가 카뮈의 이장을 추진했으나 정치적 이용이라는 반발에 부딪혀 무산되었다. 바로 옆 생 에티엔 뒤 몽 성당에는 파리에 하나뿐인 원형 그대로의 "쥐베"(성가대와 신자석을 가르는 조각 칸막이)가 남아있고, 철학자 파스칼과 극작가 라신의 무덤도 이곳에 있다.</div></td></tr><tr><td class="t">17:00<div class="kt">(한국 익일 00:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Jardin+du+Luxembourg+Paris" target="_blank" rel="noopener">뤽상부르 공원</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Boulevard+Saint-Germain+Paris" target="_blank" rel="noopener">생제르맹 거리</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=%C3%89glise+Saint-S%C3%A9verin+Paris" target="_blank" rel="noopener">생 세브랭 교회</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Shakespeare+and+Company+Paris" target="_blank" rel="noopener">셰익스피어 앤 컴퍼니</a><div class="memo info">10월 초 기준 18:45 폐장하는 프랑스식 정원 산책 후 성당·서점 관람. <b>보통</b>: 서점 앞 대기줄·좁은 통로에서 뒤에서 밀착하는 가방털이범 지퍼 사수</div><div class="hist">📜 뤽상부르 공원은 1612년 앙리 4세의 미망인 마리 드 메디시스가 고향 피렌체 피티 궁전을 그리워하며 조성했다. 셰익스피어 앤 컴퍼니(현재 위치 1951년 개점, 초대 서점은 1919년 실비아 비치가 개업)는 헤밍웨이·제임스 조이스 등 "잃어버린 세대" 작가들의 아지트였으며, 조이스의 <율리시스> 초판(1922)을 출간한 곳으로 문학사에 기록되어 있다. 뤽상부르 공원에는 19세기 조성된 양봉장이 있어 파리에서 가장 오래된 양봉 학교로 꼽히며, 자유의 여신상 작가 바르톨디가 만든 초기 소형 모형도 정원 한편에 전시되어 있다. 실비아 비치의 원조 서점은 1941년 나치 장교에게 <피네간의 경야> 마지막 재고본 판매를 거부한 뒤 폐업했고 이후 다시 열리지 않았다. 조지 휘트먼은 서점을 찾는 무명 작가·여행자들을 "텀블위드"라 부르며 하루 한 권 독서와 약간의 노동을 조건으로 무료 숙박을 제공했고, 60여 년간 수만 명이 이런 방식으로 서점에서 머물렀다.</div></td></tr><tr><td class="t">18:30<div class="kt">(한국 익일 01:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Notre-Dame+Cathedral+Paris" target="_blank" rel="noopener">노트르담 대성당</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Square+Jean+XXIII+Paris" target="_blank" rel="noopener">요한23세 광장</a><div class="memo warn">일몰(19:23) 직후 대성당 외관·야간 조명 감상. <b>주의</b>: 에펠탑 모형 완구를 쏘아 올리며 강매하는 잡상인 단호히 거절</div><div class="hist">📜 1163년 착공해 1345년 완공까지 약 180년이 걸린 프랑스 고딕 건축의 걸작. 1804년 나폴레옹의 황제 대관식이 열렸고, 빅토르 위고의 소설 <파리의 노트르담>(1831)이 당시 철거 위기의 성당을 구하는 여론을 이끌어냈다. 2019년 4월 화재로 첨탑과 지붕이 소실되었으나 5년간의 복원을 거쳐 2024년 12월 재개관했다. 정면의 "왕들의 회랑" 조각상들은 혁명기 파리 시민들이 프랑스 왕으로 오인해 모두 목을 잘랐으나 실제로는 구약의 유다 왕들이었고, 1977년 파리 시내 공사장에서 잘린 두상들이 발견되어 현재 클뤼니 박물관에 전시되어 있다. 첨탑 꼭대기 수탉 풍향계 안에는 가시관 조각과 성인들의 유물이 봉인되어 있는데, 2019년 화재로 첨탑이 무너진 뒤 잔해 속에서 손상 없이 발견되어 화제가 되었다. 성당 앞 광장 바닥의 "포인트 제로" 동판은 프랑스 전 국토 도로 거리 측정의 기준점 역할을 한다. 첨탑 주변 가고일과 괴수 조각 다수는 중세 원형이 아니라 19세기 복원가 비올레르뒤크의 창작물이며, 그는 자신의 얼굴을 사도 조각상에 새겨 넣기도 했다.</div></td></tr><tr><td class="t">20:00<div class="kt">(한국 익일 03:00)</div></td><td class="p">버스 이동(숙소) — <a class="maploc" href="https://maps.app.goo.gl/7E9icnNb6mJoWh8CA" target="_blank" rel="noopener">Saint-Michel정류장</a> → 27번 버스(12개 정류장) → <a class="maploc" href="https://maps.app.goo.gl/HbNLn9uAsT8eJT556" target="_blank" rel="noopener">Gare Saint-Lazare정류장</a></td></tr><tr><td class="t">20:30<div class="kt">(한국 익일 03:30)</div></td><td class="p">석식 (즉석 한식)</td></tr><tr><td class="t">21:30<div class="kt">(한국 익일 04:30)</div></td><td class="p">마을 산책</td></tr><tr><td class="t">23:00<div class="kt">(한국 익일 06:00)</div></td><td class="p">숙소 도착 (정비 / 사전 짐정리) — <a class="maploc" href="https://maps.app.goo.gl/vi7RuWbLsy7BVPN77" target="_blank" rel="noopener">호텔 채링 크로스</a></td></tr><tr><td class="t">00:00<div class="kt">(한국 07:00)</div></td><td class="p">취침 (6H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d5" class="day-panel">
+<div class="card">
+<h2>Day5 · 10/5(월) 파리 마무리 → 베네치아 도착 → 렌트카 → 폴리나(Follina)</h2>
+<div class="daymeta" data-wx-day="d5">🌅 일출 07:56 / 07:15 · 🌇 일몰 19:21 / 18:43 · 🌡️ 파리 <span id="wxCond-d5-0" class="wx-cond"></span><span id="wxTemp-d5-0" class="wx-temp">예상 21/11°C</span> · 🌡️ 폴리나 <span id="wxCond-d5-1" class="wx-cond"></span><span id="wxTemp-d5-1" class="wx-temp">예상 23/10°C</span></div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>오를리공항 T1 국내선/솅겐권 내 이동이라 수속 비교적 간단하나 여유있게 도착</li><li>베네치아 공항에서 렌트카 인수 시 국제운전면허증·보험 서류 확인</li><li>이탈리아 초행 고속도로 톨게이트 결제방식(텔레패스/현금) 숙지</li></ul></div>
+<div class="alert info">✈️ <b>항공편 안내</b><br><b>EJU4873</b> 파리 오를리(ORY) T1 → 베네치아(VCE) · 보딩 14:00 / 이륙 14:10 · 랜딩 15:50</div>
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">호텔 조식</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p">주변 산책</td></tr><tr><td class="t">08:30<div class="kt">(한국 15:30)</div></td><td class="p">사전 짐정리</td></tr><tr><td class="t">09:00<div class="kt">(한국 16:00)</div></td><td class="p">도보 이동</td></tr><tr><td class="t">09:30<div class="kt">(한국 16:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Palais+Garnier+Paris" target="_blank" rel="noopener">오페라 가르니에</a><div class="memo warn"><b>[TOT: €50]</b> 사전 티켓 구매 필수 — 공연·리허설로 임시 휴관 잦아 방문일 임박해 재확인 권장. <b>주의</b>: 화려한 계단에서 촬영에 몰두하는 틈에 가방 지퍼를 여는 소매치기 발생, 백팩은 앞으로</div><div class="hist">📜 나폴레옹 3세의 명으로 건축가 샤를 가르니에가 설계해 1875년 완공한 네오바로크 양식의 오페라 하우스. 1896년 실제로 샹들리에가 떨어져 관객이 사망한 사고가 가스통 르루의 소설 <오페라의 유령>(1910)의 모티프가 되었고, 지하에는 실제로 저수조가 존재한다. 화려한 대계단과 마르크 샤갈이 1964년 그린 천장화도 감상 포인트. 오페라 가르니에 건립은 1858년 나폴레옹 3세가 구 오페라 극장 앞에서 폭탄 테러를 당한 사건이 직접적 계기가 되어, 건물 서쪽에는 황제의 마차가 바로 입장하는 전용 통로가 따로 마련되었다. 대계단은 이탈리아산 흰 대리석과 스웨덴산 녹색 대리석 등 여러 나라에서 들여온 대리석으로 꾸며졌다. 나폴레옹 3세가 자신의 이름을 건물에 새기지 못하게 하자, 건축가 가르니에는 구독자용 원형홀 천장 문양 속에 자기 이름을 몰래 숨겨 넣었다.</div></td></tr><tr><td class="t">11:00<div class="kt">(한국 18:00)</div></td><td class="p">호텔 복귀 / 체크아웃</td></tr><tr><td class="t">11:30<div class="kt">(한국 18:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Paris+Orly+Airport+Terminal+1" target="_blank" rel="noopener">파리 오를리공항 T1</a> 이동</td></tr><tr><td class="t">12:00<div class="kt">(한국 19:00)</div></td><td class="p">출국심사</td></tr><tr><td class="t">13:00<div class="kt">(한국 20:00)</div></td><td class="p">출국장 대기</td></tr><tr><td class="t">14:00<div class="kt">(한국 21:00)</div></td><td class="p">EJU4873 보딩 / 14:10 이륙 (오를리 → 베네치아)</td></tr><tr><td class="t">15:30<div class="kt">(한국 22:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Venice+Marco+Polo+Airport" target="_blank" rel="noopener">베네치아 마르코폴로공항(VCE)</a> 랜딩(15:50착)</td></tr><tr><td class="t">16:00<div class="kt">(한국 23:00)</div></td><td class="p">입국심사</td></tr><tr><td class="t">16:30<div class="kt">(한국 23:30)</div></td><td class="p">렌트카 인수(Budget Car Rental Venice) — <a class="maploc" href="https://maps.app.goo.gl/egPiDVk94unyogFr6" target="_blank" rel="noopener">렌트카 인수 장소</a><div class="memo info">☆ 국제운전면허증 필수 지참</div></td></tr><tr><td class="t">17:00<div class="kt">(한국 익일 00:00)</div></td><td class="p">렌트카 이동(1H)<div class="memo info">☆ 톨게이트(텔레패스) 이용방법 사전 확인</div></td></tr><tr><td class="t">18:00<div class="kt">(한국 익일 01:00)</div></td><td class="p">숙소 체크인 — <a class="maploc" href="https://maps.app.goo.gl/f4gPQzDxbgH6rTWs9" target="_blank" rel="noopener">Agriturismo Memento</a><div class="memo info">주소: Via Altariol, 12, 31051 Follina TV, 이탈리아</div></td></tr><tr><td class="t">18:30<div class="kt">(한국 익일 01:30)</div></td><td class="p">석식 (즉석 한식)</td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p">마을 산책</td></tr><tr><td class="t">21:30<div class="kt">(한국 익일 04:30)</div></td><td class="p">숙소 도착(Agriturismo Memento(폴리나)) — <a class="maploc" href="https://maps.app.goo.gl/f4gPQzDxbgH6rTWs9" target="_blank" rel="noopener">지도 보기</a> (정비 / 사전 짐정리)</td></tr><tr><td class="t">22:30<div class="kt">(한국 익일 05:30)</div></td><td class="p">휴식</td></tr><tr><td class="t">00:00<div class="kt">(한국 07:00)</div></td><td class="p">취침 (6H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d6" class="day-panel">
+<div class="card">
+<h2>Day6 · 10/6(화) 폴리나 → 트레치메 디 라바레도 트레킹 → 브라이에스 호수 → 오르티세이</h2>
+<div class="daymeta" data-wx-day="d6">🌅 일출 07:16 / 07:18 · 🌇 일몰 18:42 / 18:43 · 🌡️ 트레치메 <span id="wxCond-d6-0" class="wx-cond"></span><span id="wxTemp-d6-0" class="wx-temp">예상 16/4°C</span> · 2,333m 고지대라 체감은 표기값보다 5~10℃ 더 낮고 바람도 강함 · 🌡️ 오르티세이 <span id="wxCond-d6-1" class="wx-cond"></span><span id="wxTemp-d6-1" class="wx-temp">예상 11/-3°C</span></div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>오늘의 핵심: 트레치메 왕복 트레킹 총 약 8km(아우론조↔로카텔리 동굴 왕복), 순수 보행시간 약 3~3.5시간</li><li>아우론조 산장 주차 QR 예약 필수 확인 — 미예약 시 진입 불가</li><li>방한 레이어링(③ 장비 체크리스트) + 트레킹폴 + 무릎보호대(하산 구간) 준비</li><li>행동식·물 충분히 지참, 로카텔리 동굴 구간은 미끄러운 흙길이므로 등산화 필수</li><li>브라이에스 호수는 짧게 들러 일몰 전 이동 시간 확보</li></ul></div>
+
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">조식 / 체크아웃</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Abbazia+di+Santa+Maria+di+Follina" target="_blank" rel="noopener">폴리나 성모 시토회 수도원</a><div class="memo info">12세기 중반 베네딕토회 수도사들이 세우고 1194년 시토회로 소속이 바뀌며 대대적으로 중창. 로마네스크 양식의 회랑, 성스러운 성배의 성모상, 1527년 성모자 벽화 등 중세·르네상스 프레스코화 보유</div></td></tr><tr><td class="t">08:30<div class="kt">(한국 15:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Cison+di+Valmarino+Italy" target="_blank" rel="noopener">치손 디 발마리노 마을</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Piazza+Roma+Cison+di+Valmarino" target="_blank" rel="noopener">로마 광장</a><div class="memo info">붉은 외벽의 시청사(Municipio)와 베네치아 공화국 시절 법정이던 로지아 극장(Teatro Loggia) 보존. 광장 카페에서 커피·프로세코 와인과 함께 여유</div><div class="hist">📜 이탈리아에서 "가장 아름다운 마을"협회(Borghi più belli d'Italia)에 등재된 마을로, 언덕 위 브란돌리니 성(9세기 기원)이 마을을 내려다본다. 중세 베네치아 공화국 시절 이 지역 행정·사법 중심지였고, 로지아 극장(14세기)은 당시 재판이 열리던 열주 회랑. 프로세코 와인 산지로도 유명해 광장 카페마다 현지 스파클링 와인을 맛볼 수 있다. 이 성채가 서 있던 언덕은 로마시대는 물론 고트족·랑고바르드족 시대부터 사람이 거주했으며, 962년 신성로마제국이 체네다 주교에게 이 지역에 대한 권한을 하사하면서 정식 봉토로 편입되었다. 1436년 베네치아 공화국은 이 성을 브란돌리니 가문과 당대 최고의 용병대장이었던 가타멜라타에게 공동 하사했는데, 이후 브란돌리니 가문이 1959년까지 대대로 소유했다. 이후 신학교로 쓰이다 1997년 한 기업가가 인수해 "카스텔브란도"라는 호텔·스파로 복원했으며, 2009년 G8 농업장관회의가 이곳에서 열렸다.</div></td></tr><tr><td class="t">09:30<div class="kt">(한국 16:30)</div></td><td class="p">렌트카 이동(2H) — 미주리나 호수 경유<div class="memo info">※ 늦은 점심 대비 간식 챙기기</div></td></tr><tr><td class="t"></td><td class="p">&nbsp;&nbsp;↳ <a class="maploc" href="https://maps.app.goo.gl/gatsS7WjH3vT2t7M6" target="_blank" rel="noopener">미주리나 호수</a><div class="memo info">소라피스 산자락이 비치는 호수, 20분 정도 짧게 감상</div></td></tr><tr><td class="t">11:30<div class="kt">(한국 18:30)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/VG6sbkgdjzT5DCPM7" target="_blank" rel="noopener">아우론조 산장 주차장(Parcheggio Auronzo)</a><div class="memo warn"><b>☆ 주차장 사전예약(QR) 필수</b>, 32041 Auronzo, Province of Belluno · 해발 2,333m "신들의 산책로" 초입 · 편도 약 7.5km 산악도로, 소요 15~20분. <b>주의</b>: 사전 QR 예약 시 입력한 렌트카 번호판이 실제 인수받은 차량 번호와 일치하는지 반드시 재확인(불일치 시 진입 거부 가능)</div><div class="hist">📜 트레치메 디 라바레도(해발 2,999m)의 세 봉우리는 1869년 폴 그로만이 초등한 이래 유럽 등반의 성지가 되었다. 제1차 세계대전(1915~1917) 당시 이탈리아-오스트리아군의 격전지로, 봉우리 곳곳에 당시 파놓은 참호와 터널이 지금도 남아있다. "신들의 산책로(Sentiero degli Dei가 아닌 현지 별칭)"라 불리는 이 트레킹 코스는 2009년 유네스코 세계자연유산(돌로미티)으로 등재되었다. 1915년 여름 인근 세스토 마을은 오스트리아군 포격으로 교구 성당이 파괴돼 주민 전원이 대피했고, 마을 재건은 1923년에야 끝났다. 오스트리아-헝가리군과 이탈리아군은 인근 봉우리에 여러 겹의 방어선을 구축했고, 밤 기온이 영하 30도까지 떨어져 양측 모두 전문 스키부대를 투입했다. 정작 트레치메 세 봉우리 자체는 암벽이 너무 가팔라 직접적인 백병전은 드물었고, 양측은 인근 능선에서 서로를 감시하며 대치하는 형태였다.</div></td></tr><tr><td class="t">12:00<div class="kt">(한국 19:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Rifugio+Auronzo+Tre+Cime" target="_blank" rel="noopener">아우론조 산장</a> → <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Rifugio+Lavaredo+Tre+Cime" target="_blank" rel="noopener">라바레도 산장</a><div class="memo info">아우론조 산장 → 라바레도 산장, 약 1.7~2.0km(30~40분). 평탄하고 폭 넓은 자갈길, 경사 거의 없음. 왼쪽 트레치메 봉우리, 오른쪽 카디니 디 미주리나 암봉 조망, 중간 작은 알프스 교회</div></td></tr><tr><td class="t">12:30<div class="kt">(한국 19:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Rifugio+Lavaredo+Tre+Cime" target="_blank" rel="noopener">라바레도 산장</a> → <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Rifugio+Locatelli+Tre+Cime" target="_blank" rel="noopener">로카텔리 산장</a><div class="memo info">라바레도 산장 → 라바레도 고개(Forcella Lavaredo) → 로카텔리 산장, 약 2.2km(45~50분). 초반 15~20분 가파른 자갈 오르막(구간 중 가장 힘든 부분), 고개에서 트레치메 북면 거대 세 봉우리 전경. 이후 완만한 내리막·평탄 트레일</div></td></tr><tr><td class="t">13:30<div class="kt">(한국 20:30)</div></td><td class="p">중식 / 행동식</td></tr><tr><td class="t">14:00<div class="kt">(한국 21:00)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/ozKGHCr26boMLvEZA" target="_blank" rel="noopener">로카텔리 동굴(Grotta delle Tre Cime)</a><div class="memo warn">로카텔리 산장 → 동굴(Grotta), 약 200~300m(5~10분). 산장 뒤편 암벽(사소 디 세스토 방면)으로 약간 등반, 가파르고 미끄러운 흙·자갈길이라 발목 주의</div></td></tr><tr><td class="t">14:30<div class="kt">(한국 21:30)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/ozKGHCr26boMLvEZA" target="_blank" rel="noopener">로카텔리 동굴(Grotta delle Tre Cime)</a> → <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Rifugio+Lavaredo+Tre+Cime" target="_blank" rel="noopener">라바레도 산장</a><div class="memo warn">동굴 → 라바레도 고개 → 라바레도 산장, 약 2.4km(45~50분). 고개까지는 완만한 오르막, 고개~산장 구간은 자갈 많은 가파른 내리막이라 무릎 부담 주의(무릎보호대 권장)</div></td></tr><tr><td class="t">15:30<div class="kt">(한국 22:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Rifugio+Lavaredo+Tre+Cime" target="_blank" rel="noopener">라바레도 산장</a> → <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Rifugio+Auronzo+Tre+Cime" target="_blank" rel="noopener">아우론조 산장</a> (최종 복귀)<div class="memo info">약 1.7~2.0km(30~35분). 처음 출발했던 평탄하고 넓은 길, 체력 저하 시점이나 경사 없어 편안하게 마무리</div></td></tr><tr><td class="t">16:00<div class="kt">(한국 23:00)</div></td><td class="p">렌트카 이동(1H) → 브라이에스 호수 유료주차장</td></tr><tr><td class="t">17:00<div class="kt">(한국 익일 00:00)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/JdvjRgSJaeZcn9pK8" target="_blank" rel="noopener">브라이에스 호수</a> — 산책 및 일몰 감상<div class="hist">📜 해발 1,496m에 위치한 돌로미티에서 가장 유명한 호수로, 에메랄드빛 호수와 목조 보트하우스(1930년대)가 어우러진 풍경으로 "돌로미티의 진주"라 불린다. 세라 디 크로다 로사 봉우리가 호수에 그대로 비쳐 보이는 것으로 유명하며, 최근 SNS 명소로 급부상해 성수기에는 진입 자체를 예약·통제하는 경우가 많다. 1945년 4월, 다하우 강제수용소에서 이송된 17개국 출신 저명인사·요인 가족 130여 명("프로미넨텐")이 이 호숫가의 그랜드호텔에 옮겨져 감금되었다. 이들 중에는 히틀러 암살 미수 주모자의 일가, 소련군 장성, 성직자 등이 포함되어 있었으며, 나치는 이들을 연합군과의 협상 인질로 삼으려 했다. 독일 국방군이 이들을 SS로부터 넘겨받아 보호했고, 1945년 5월 미군에 의해 무사히 해방되었다. 이 실화는 이후 여러 다큐멘터리와 서적의 소재가 되었으며, 당시의 호텔 건물은 오늘날에도 호숫가 숙소로 운영되고 있다.</div></td></tr><tr><td class="t">18:00<div class="kt">(한국 익일 01:00)</div></td><td class="p">렌트카 이동(1.5H) → 숙소</td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p">숙소 체크인 — <a class="maploc" href="https://maps.app.goo.gl/1XbX4jsv4cw4U6FT6" target="_blank" rel="noopener">호텔 빌라 에밀리아</a><div class="memo info">주소: Via Mureda 61, 오르티세이, 39046, 이탈리아</div></td></tr><tr><td class="t">20:00<div class="kt">(한국 익일 03:00)</div></td><td class="p">석식 (즉석 한식)</td></tr><tr><td class="t">21:00<div class="kt">(한국 익일 04:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Ortisei+town+square+fountain" target="_blank" rel="noopener">오르티세이 분수광장</a> / 마을 산책</td></tr><tr><td class="t">22:30<div class="kt">(한국 익일 05:30)</div></td><td class="p">숙소 도착 — <a class="maploc" href="https://maps.app.goo.gl/1XbX4jsv4cw4U6FT6" target="_blank" rel="noopener">호텔 빌라 에밀리아</a></td></tr><tr><td class="t">23:00<div class="kt">(한국 익일 06:00)</div></td><td class="p">취침 (7H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d7" class="day-panel">
+<div class="card">
+<h2>Day7 · 10/7(수) 알페 디 시우시 · 세체다 케이블카 트레킹 → 발 디 푸네스</h2>
+<div class="daymeta" data-wx-day="d7">🌅 일출 07:19 · 🌇 일몰 18:41 · 🌡️ <span id="wxCond-d7-0" class="wx-cond"></span><span id="wxTemp-d7-0" class="wx-temp">예상 14/-2°C</span> · 알페디시우시·세체다 고산지대는 최저 -3~0℃까지 가능</div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>세체다·알페디시우시 케이블카 모바일 티켓 사전구매 확인(왕복 통합권 €74)</li><li>오전 고지대는 영하권 가능 — 방한장갑·모자 착용 후 출발</li><li>발 디 푸네스는 유료주차장 현금·카드 결제수단 준비</li></ul></div>
+
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">조식 / 출발 준비</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p">도보 이동 — <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Seiser+Alm+Bahn+Ortisei" target="_blank" rel="noopener">알페 디 시우시(몽 셰욱) 케이블카 승강장</a></td></tr><tr><td class="t">08:30<div class="kt">(한국 15:30)</div></td><td class="p">케이블카 승차 대기 / 승차<div class="memo info">사전구매한 모바일 티켓 확인</div></td></tr><tr><td class="t">09:00<div class="kt">(한국 16:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Alpe+di+Siusi+Ortisei" target="_blank" rel="noopener">알페 디 시우시(몽 셰욱)</a> → <a class="maploc" href="https://maps.app.goo.gl/PzmzP62NZXLfCZAY9" target="_blank" rel="noopener">Contrin 산장</a> → <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Seiser+Alm+Bahn+mountain+station+Alpe+di+Siusi" target="_blank" rel="noopener">탑승장 이동(하산)</a><div class="memo info">사쏘룽고·사쏘피아토 능선 조망, 완만한 초원길 왕복 40~50분(알펜호텔 파노라마까지는 이동하지 않음)</div><div class="hist">📜 해발 1,680~2,000m에 걸쳐 펼쳐진 알페 디 시우시는 약 56㎢ 면적의 유럽 최대 고산 초원지대로, 1974년부터 차량 통제 구역으로 지정되어 케이블카나 셔틀버스로만 진입 가능하다. 멀리 보이는 사쏘룽고(2,873m)·사쏘피아토 봉우리는 날카로운 첨탑 형상으로 등반가들 사이에서 "돌로미티의 여왕"으로 불린다. 이 고원을 둘러싼 실체 산군에는 폭풍을 몰고 오는 마녀를 한 농부가 축성된 총알로 쏘아 죽였다는 전설이 전해지는데, 고원에는 지금도 "마녀의 샘" 트레킹 코스와 "마녀의 의자" 바위가 남아 있다. 사쏘룽고 역시 트레치메와 같은 해인 1869년 폴 그로만이 초등했다. "사쏘룽고에 구름이 걸리면 발 가르데나 날씨가 맑다"는 현지 속담이 있을 만큼 봉우리의 구름 모양은 예로부터 날씨를 점치는 지표로 쓰였다.</div></td></tr><tr><td class="t">10:00<div class="kt">(한국 17:00)</div></td><td class="p">케이블카 하산 / 도보 이동<div class="memo info">오르티세이 마을로 복귀 → 세체다 케이블카 승강장, 약 10분</div></td></tr><tr><td class="t">10:30<div class="kt">(한국 17:30)</div></td><td class="p">휴식 (티타임)</td></tr><tr><td class="t">11:00<div class="kt">(한국 18:00)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/WSZjuxT7fCEJiwq79" target="_blank" rel="noopener">오르티세이 세체다 케이블카 승강장</a> → <a class="maploc" href="https://maps.app.goo.gl/U45AxMKxUe4dUaA59" target="_blank" rel="noopener">푸르네스역</a> 환승 → 세체다<div class="memo info">총 15~20분 소요, €74(왕복 통합권)</div></td></tr><tr><td class="t">11:30<div class="kt">(한국 18:30)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/5pTRMuB5ffX8PPwV7" target="_blank" rel="noopener">세체다 능선 전망대</a> — 하이킹<div class="memo info">승강장에서 전망대까지 도보 10~15분, 주변 능선 산책 포함 여유 있게 1.5시간</div><div class="hist">📜 해발 2,518m의 세체다는 톱니처럼 날카로운 오돌레 산군 능선이 한눈에 펼쳐지는 돌로미티 최고의 전망 포인트로 꼽힌다. 2010년 케이블카가 현대화되며 접근성이 크게 개선되었고, 내셔널지오그래픽 등 여러 매체가 "세계에서 가장 아름다운 하이킹 코스" 중 하나로 꼽아왔다. 산 아래로 보이는 초록 목초지와 뾰족한 회백색 봉우리의 대비가 이 지역 특유의 풍경. 세체다가 속한 발 가르데나는 돌로미티 라딘어를 쓰는 계곡 중 하나로, 17세기부터 목각 공예로 유명해 성탄 구유 인형 등을 전 세계로 수출해온 전통 공예 지역이다. 오돌레 산군은 푸에츠-오돌레 자연공원의 핵심 구역이며, 2009년 유네스코 세계자연유산(돌로미티) 등재 당시에도 포함되었다. 세체다 정상까지는 차도가 없어 곤돌라가 유일한 접근 수단이며, 2010년 개통 전에는 낡은 리프트를 여러 번 갈아타야 했다.</div></td></tr><tr><td class="t">13:00<div class="kt">(한국 20:00)</div></td><td class="p">케이블카 하산 — 세체다 → 푸르네스 → 오르티세이</td></tr><tr><td class="t">13:30<div class="kt">(한국 20:30)</div></td><td class="p">중식 / 현지식 / 휴식 — 추천: <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Tubladel+Restaurant+Ortisei" target="_blank" rel="noopener">Tubladel</a> 또는 <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Zicoria+Brasserie+Ortisei" target="_blank" rel="noopener">Zicoria Brasserie</a><div class="memo info">가능하면 호텔 방향(중심가~Via Mureda 사이)에서 식사. 두 곳 모두 오르티세이 중심가에 위치한 남티롤 전통요리 전문점</div></td></tr><tr><td class="t">14:30<div class="kt">(한국 21:30)</div></td><td class="p">숙소 복귀 (차량 운행) — <a class="maploc" href="https://maps.app.goo.gl/1XbX4jsv4cw4U6FT6" target="_blank" rel="noopener">호텔 빌라 에밀리아</a></td></tr><tr><td class="t">15:00<div class="kt">(한국 22:00)</div></td><td class="p">렌트카 이동 → <a class="maploc" href="https://maps.app.goo.gl/7SKzySRfEwDVzpbu6" target="_blank" rel="noopener">Parkplatz Bergerplatz</a><div class="memo info">유료 주차장(€5) + 도보 짧게</div></td></tr><tr><td class="t">15:30<div class="kt">(한국 22:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=St.+Johann+in+Ranui+Church" target="_blank" rel="noopener">성 조반니 인 라누이 성당</a> + 전망대 관람<div class="hist">📜 1394년 지어진 작은 로마네스크 양식 예배당으로, 발 디 푸네스 계곡의 오돌레 산군을 배경으로 홀로 서 있는 모습이 세계에서 가장 많이 사진 찍히는 교회 중 하나로 꼽힌다. 양파 모양의 첨탑 지붕은 18세기에 추가된 바로크 양식. 내부에는 14세기 후반의 프레스코화 일부가 남아 있다. 이름과 달리 이 성당의 수호성인은 세례자 요한이 아니라 다리와 홍수의 수호성인으로 알려진 "네포무크의 성 요한"이며, 종탑 꼭대기의 별 모양 장식이 그의 순교를 상징한다. 성당이 자리한 농가는 원래 12세기까지 거슬러 올라가는 사냥용 별장이었다. 2009년 오스트리아 우체국이 이 성당의 모습을 크리스마스 우표 도안으로 사용하며 국제적으로 더 알려졌다.</div></td></tr><tr><td class="t">16:00<div class="kt">(한국 23:00)</div></td><td class="p">렌트카 이동 → 발 디 푸네스</td></tr><tr><td class="t">16:30<div class="kt">(한국 23:30)</div></td><td class="p">발 디 푸네스 마을 산책<div class="memo info">마을 유료주차장(Putzen/Filler/Bergerplatz 중 한 곳, €5~8)</div></td></tr><tr><td class="t">17:00<div class="kt">(한국 익일 00:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Chiesa+di+Santa+Maddalena+Val+di+Funes" target="_blank" rel="noopener">산타 막달레나 성당</a><div class="memo info">도보 10분, 전망 포인트 산책(오돌레 산군 배경 조망)</div><div class="hist">📜 18세기 초 바로크 양식으로 지어진 이 성당은 두 개의 뾰족한 첨탑과 배경의 오돌레 산군이 이루는 구도로 돌로미티에서 가장 널리 알려진 사진 명소가 되었다. 안셀 아담스풍 풍경사진가들 사이에서 "발 디 푸네스 뷰"로 불리며, 특히 가을 단풍철과 일출·일몰 시간대에 많은 사진가들이 몰린다. 이 성당에 대한 최초 기록은 1394년까지 거슬러 올라가며, 15세기 종탑만 남기고 전면 재건된 뒤 18세기에 다시 바로크 양식으로 개축되어 지금의 모습이 되었다. 외벽은 후기 고딕 양식이 남아 있는 반면 내부는 바로크 양식으로, 이런 이중적 구조는 돌로미티 성당 중에서도 드문 사례다. 전설에 따르면 폭풍우 속에서 성녀 마리아 막달레나의 상이 나타난 것이 성당 건립의 계기가 되었다고 전해진다.</div></td></tr><tr><td class="t">17:30<div class="kt">(한국 익일 00:30)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/4ajEuPiu2GafLSnd8" target="_blank" rel="noopener">일몰 포스트</a> 이동<div class="memo info">체감 일몰 약 18:00~18:25, 부드러운 오후 햇살</div></td></tr><tr><td class="t">18:30<div class="kt">(한국 익일 01:30)</div></td><td class="p">숙소 이동 — <a class="maploc" href="https://maps.app.goo.gl/1XbX4jsv4cw4U6FT6" target="_blank" rel="noopener">호텔 빌라 에밀리아</a></td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p">석식 (즉석 한식)</td></tr><tr><td class="t">20:30<div class="kt">(한국 익일 03:30)</div></td><td class="p">마을 산책</td></tr><tr><td class="t">22:00<div class="kt">(한국 익일 05:00)</div></td><td class="p">숙소 도착 — <a class="maploc" href="https://maps.app.goo.gl/1XbX4jsv4cw4U6FT6" target="_blank" rel="noopener">호텔 빌라 에밀리아</a> (정비 / 사전 짐정리)</td></tr><tr><td class="t">23:00<div class="kt">(한국 익일 06:00)</div></td><td class="p">취침 (7H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d8" class="day-panel">
+<div class="card">
+<h2>Day8 · 10/8(목) 리모네 술 가르다 경유 → 베로나 도착 & 시내 관광</h2>
+<div class="daymeta" data-wx-day="d8">🌅 일출 07:24 / 07:23 · 🌇 일몰 18:43 / 18:43 · 🌡️ 리모네 <span id="wxCond-d8-0" class="wx-cond"></span><span id="wxTemp-d8-0" class="wx-temp">예상 16/8°C</span> · 🌡️ 베로나 <span id="wxCond-d8-1" class="wx-cond"></span><span id="wxTemp-d8-1" class="wx-temp">예상 19/9°C</span></div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>가르다호 SR249 도로 정체 가능성 — 이동시간 여유있게</li><li>줄리엣의 집 온라인 티켓 사전구매 확인(2026.4.1 요금 변경분 반영)</li><li>오늘 석식은 즉석 한식이 아닌 현지식 예정</li></ul></div>
+
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">조식 / 체크아웃</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p">렌트카 이동 — 볼차노 경유 A22/E45 고속도로 → <a class="maploc" href="https://maps.app.goo.gl/89vbyx46aqptT8rS7" target="_blank" rel="noopener">리모네 술 가르다 주차장(Lakeside Parking)</a></td></tr><tr><td class="t">10:30<div class="kt">(한국 17:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Limone+sul+Garda+Italy" target="_blank" rel="noopener">리모네 술 가르다</a> 산책 겸 간식<div class="memo info">호숫가 카페</div><div class="hist">📜 이름의 "리모네(레몬)"는 실제로 18세기부터 이 마을이 알프스 이남 최북단 레몬 재배지였던 데서 유래했다. 가파른 절벽에 계단식으로 지어진 "리모나이에"(레몬 온실)가 지금도 마을 곳곳에 남아 있으며, 1980년 이곳 주민의 혈액에서 심혈관 질환을 막아주는 "ApoA-1 밀라노" 단백질이 발견되어 의학사에 이름을 남기기도 했다. 밀라노 대학 연구팀이 학계에 처음 발표하며 널리 알려졌고, 마을 주민 약 3.5%가 이 유전자를 보유한 것으로 조사되었다. 제약회사들이 합성 버전을 심혈관질환 치료제로 개발했으나 2016년 임상시험 부진으로 개발이 중단되었다. 마을은 1932년 도로가 개통되기 전까지 육로가 없어 배와 산길로만 드나들 수 있었을 만큼 고립된 곳이었다. 리모나이에는 겨울철 서리를 막기 위해 나무 기둥과 유리창으로 덮는 온실 구조였고, 한때 수확한 레몬을 배로 오스트리아까지 실어 날랐다.</div></td></tr><tr><td class="t">11:30<div class="kt">(한국 18:30)</div></td><td class="p">렌트카 이동 — <a class="maploc" href="https://maps.app.goo.gl/2hU9SPNdr28C2hVf7" target="_blank" rel="noopener">베로나 숙소 주차장(Parcheggio Saba Arena)</a><div class="memo info">가르다 호수 동안 도로(SR249) 경유, 약 1시간~1시간20분(호숫가 교통혼잡 가능성, 여유있게)</div></td></tr><tr><td class="t">13:30<div class="kt">(한국 20:30)</div></td><td class="p">숙소 체크인/얼리체크인 — <a class="maploc" href="https://maps.app.goo.gl/Red8iEinNnhSf6vL9" target="_blank" rel="noopener">베로나 숙소(B&B Corso Porta Nuova 39)</a><div class="memo info">주소: Corso Porta Nuova 39, 치타델라-포르타 누오바, 베로나, 37122 · 체크인 시 차량번호 안내</div></td></tr><tr><td class="t">14:00<div class="kt">(한국 21:00)</div></td><td class="p">중식 (즉석 한식)</td></tr><tr><td class="t">14:30<div class="kt">(한국 21:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Verona+Arena" target="_blank" rel="noopener">베로나 아레나</a><div class="hist">📜 서기 30년경 로마 황제 티베리우스 시대에 지어진 원형경기장으로, 콜로세움보다 앞서 지어졌으며 로마제국 3대 원형극장 중 하나로 꼽힌다. 1117년 대지진으로 외벽 대부분이 붕괴되었으나 내부 관람석은 온전히 보존되어 현재까지 실제 공연장으로 쓰이고 있다. 1913년부터 매년 여름 베로나 오페라 페스티벌이 열려 3만 명 규모 야외 오페라 공연장으로 세계적 명성을 얻었다. 전설에 따르면 한 죄수가 악마와 거래해 하룻밤 만에 경기장을 짓기로 했으나, 새벽 기도를 알리는 종소리에 놀란 악마들이 공사를 멈추는 바람에 외벽 일부가 영영 미완성으로 남았다는 이야기가 전해진다. 13세기에는 처형장으로, 또 델라 스칼라 가문의 결혼 피로연 장소로 쓰이는 등 시대에 따라 용도가 계속 바뀌었다. 1751년에는 코뿔소가 전시되었고, 1786년에는 괴테가 이곳을 방문해 감탄사를 남긴 기록이 있다. 1890년과 1906년에는 미국의 "버팔로 빌 와일드 웨스트 쇼"가 공연을 펼치기도 했다.</div></td></tr><tr><td class="t">15:30<div class="kt">(한국 22:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Casa+di+Giulietta+Verona" target="_blank" rel="noopener">줄리엣의 집</a><div class="memo info">마당 €5 / 마당+내부 €12 (2026.4.1 요금 변경) — 온라인 사전구매 필수</div><div class="hist">📜 셰익스피어의 <로미오와 줄리엣>(1597) 속 캐풀렛 가문의 저택으로 알려져 있으나, 실제로는 13세기 카펠로 가문의 저택이었고 셰익스피어와의 직접적 연관성은 20세기 초 관광 목적으로 덧붙여진 이야기다. 1936년 발코니가 추가 설치되었으며, 마당 벽은 전 세계 연인들이 붙인 사랑의 메모와 껌으로 뒤덮여 있다(현재는 정기적으로 제거). 정문 아치의 쐐기돌에는 카펠로 가문의 문장인 모자 문양이 새겨져 있는데, 이 우연한 이름의 유사성이 훗날 "캐풀렛 가문의 집"이라는 이야기로 이어지는 단서가 되었다. 베로나 시는 이미 1905년에 이 건물을 사들였다. 지금의 발코니는 1936년 할리우드 영화 <로미오와 줄리엣> 세트 디자이너들과의 교류에서 얻은 아이디어로, 카스텔베키오 안뜰에 방치돼 있던 고대 로마시대 석관을 재료 삼아 만든 것이다. 마당의 청동 줄리엣 상은 오른쪽 가슴을 만지면 사랑이 이루어진다는 속설로 마모가 심해져 원본은 실내로 옮겨지고 복제품으로 교체되었을 정도다.</div></td></tr><tr><td class="t">16:30<div class="kt">(한국 23:30)</div></td><td class="p">도보 이동 — <a class="maploc" href="https://maps.app.goo.gl/dyWrUHJF7p68yb5FA" target="_blank" rel="noopener">피에트라 다리</a> 방향<div class="memo warn">아디제 강변 도보, 줄리엣의 집 진입로 좁은 골목은 소지품 주의</div></td></tr><tr><td class="t">17:00<div class="kt">(한국 익일 00:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Funicolare+Castel+San+Pietro+Verona" target="_blank" rel="noopener">산 피에트로성 푸니쿨라</a><div class="memo info">왕복 약 €3(현장구매, 가격 재확인 권장)</div></td></tr><tr><td class="t">17:30<div class="kt">(한국 익일 00:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Castel+San+Pietro+Verona" target="_blank" rel="noopener">산 피에트로 성 전망대</a> + 일몰<div class="memo info">체감 일몰 18:00~18:30, 베로나 시내·아디제 강 조망</div><div class="hist">📜 로마 시대 신전이 있던 언덕 위에 지어진 요새로, 이후 롬바르드족의 왕궁, 베네치아 공화국의 병영을 거쳐 현재 건물은 1854~1856년 오스트리아 제국이 군사기지로 재건한 것이다. 베로나 시내와 아디제 강이 한눈에 내려다보이는 최고의 전망 포인트로, 2017년 개통한 푸니쿨라 덕분에 접근이 한결 수월해졌다. 이 언덕은 기원전부터 사람이 살았던 베로나 최초의 정착지로, 로마 시대 이전부터 이미 요충지였다. 언덕 기슭에는 이탈리아 북부에서 손꼽히게 보존 상태가 좋은 로마 극장이 남아 있으며, 정상의 신전은 유피테르(주피터)에게 봉헌된 것이었다. 이곳에 궁전을 지은 동고트족 왕 테오도리쿠스는 게르만 영웅서사시 <니벨룽의 노래>에 "베른의 디트리히"로 등장하는 인물인데, 여기서 "베른"이 바로 베로나를 가리킨다.</div></td></tr><tr><td class="t">18:30<div class="kt">(한국 익일 01:30)</div></td><td class="p">시내 야경 산책</td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p">석식 (현지식) — 추천: <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Antica+Bottega+del+Vino+Verona" target="_blank" rel="noopener">Antica Bottega del Vino</a> 또는 <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Osteria+al+Duca+Verona" target="_blank" rel="noopener">Osteria al Duca</a><div class="memo info">Antica Bottega del Vino: 브라광장 인근, 18,000병 와인셀러 보유한 베로나 대표 노포. Osteria al Duca: 줄리엣의 집 근처, 합리적 가격의 2코스 세트메뉴로 유명한 전통 오스테리아</div></td></tr><tr><td class="t">21:00<div class="kt">(한국 익일 04:00)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/dyWrUHJF7p68yb5FA" target="_blank" rel="noopener">아디제 강 피에트라 다리</a> 야경 산책<div class="hist">📜 기원전 100년경 로마 시대에 건설된 베로나에서 가장 오래된 다리로, 5개의 아치 중 오른쪽 2개는 여전히 원래의 로마시대 벽돌이다. 1945년 제2차 세계대전 중 후퇴하던 독일군이 폭파했으나, 전후 강바닥에서 원래의 로마시대 석재를 건져 올려 최대한 원형에 가깝게 복원했다. 야간 조명이 켜지면 아디제 강물에 비친 다리 모습이 베로나 최고의 야경으로 꼽힌다. 로마시대 정식 명칭은 "돌다리"라는 뜻으로, 이전에 있던 목조다리와 구별하기 위해 붙여진 이름이다. 오른쪽 강변에 가장 가까운 아치는 로마시대 것이 아니라 1298년 델라 스칼라 가문이 재건한 것이며, 다리 끝에는 시내 진입을 지키는 중세 방어탑이 세워져 있었다. 1945년 폭파 당시 다섯 개 아치 중 온전히 남은 것은 왼쪽 끝 아치 하나뿐이었을 만큼 피해가 컸다.</div></td></tr><tr><td class="t">23:00<div class="kt">(한국 익일 06:00)</div></td><td class="p">숙소 도착 — <a class="maploc" href="https://maps.app.goo.gl/Red8iEinNnhSf6vL9" target="_blank" rel="noopener">베로나 숙소(B&B Corso Porta Nuova 39)</a> (정비 / 사전 짐정리)</td></tr><tr><td class="t">00:00<div class="kt">(한국 07:00)</div></td><td class="p">취침 (6H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d9" class="day-panel">
+<div class="card">
+<h2>Day9 · 10/9(금) 베로나 마무리 → 베네치아 공항 → 빈 도착 & 구시가 산책</h2>
+<div class="daymeta" data-wx-day="d9">🌅 일출 07:24 / 07:05 · 🌇 일몰 18:41 / 18:17 · 🌡️ 베로나 <span id="wxCond-d9-0" class="wx-cond"></span><span id="wxTemp-d9-0" class="wx-temp">예상 18/10°C</span> · 🌡️ 빈 <span id="wxCond-d9-1" class="wx-cond"></span><span id="wxTemp-d9-1" class="wx-temp">예상 20/6°C</span></div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>렌트카 반납 전 연료/스크래치 상태 사진으로 기록</li><li>베네치아 공항 출발 여유 확보(렌트카 반납+출국수속)</li><li>피그뮐러 슈니첼 저녁 예약 완료분 재확인</li></ul></div>
+<div class="alert info">✈️ <b>항공편 안내</b><br><b>OS544</b> 베네치아(VCE) → 빈(VIE) T3 · 보딩 14:30 / 이륙 14:35 · 랜딩 15:40</div>
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">조식 / 정비</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Castelvecchio+Verona" target="_blank" rel="noopener">카스텔베키오 성 · 다리</a><div class="hist">📜 1354~1376년 베로나를 지배하던 델라 스칼라 가문(스칼리제리 가문)이 정적과 외적의 침입에 대비해 지은 붉은 벽돌 요새. 옆의 스칼리제리 다리(폰테 스칼리제로)는 유사시 탈출용 통로로 설계되었다. 제2차 세계대전 중 폭격으로 파괴되었으나 전후 정교하게 복원되었고, 현재 내부는 만테냐·벨리니 등의 작품을 소장한 시립미술관으로 쓰인다. 이 성을 지은 이는 델라 스칼라 가문의 칸그란데 2세로, 폭정을 일삼아 용병까지 고용해 신변을 지킬 정도로 불안에 시달렸다. 그러나 정작 그는 1359년 자신의 친동생에게 암살당했으니, 탈출로로 설계된 다리도 그를 구하지는 못한 셈이다. 건축가 카를로 스카르파가 1950년대 말부터 이어간 복원은 옛것과 새것을 의도적으로 대비시켜 드러내는 방식으로 이후 세계 박물관 건축의 모범 사례가 되었다. 2015년에는 무장 강도가 만테냐 등 거장 회화를 훔쳐갔으나, 이듬해 우크라이나에서 전량 회수되어 화제가 되었다.</div></td></tr><tr><td class="t">10:00<div class="kt">(한국 17:00)</div></td><td class="p">숙소 복귀 / 체크아웃 — <a class="maploc" href="https://maps.app.goo.gl/Red8iEinNnhSf6vL9" target="_blank" rel="noopener">베로나 숙소(B&B Corso Porta Nuova 39)</a></td></tr><tr><td class="t">10:30<div class="kt">(한국 17:30)</div></td><td class="p"><a class="maploc" href="https://maps.app.goo.gl/tsscfWBBsJx4kihQA" target="_blank" rel="noopener">베네치아공항 렌터카 주차장(VCE - Park P1 Multipiano)</a> 이동</td></tr><tr><td class="t">12:00<div class="kt">(한국 19:00)</div></td><td class="p">렌트카 반납(12:30)</td></tr><tr><td class="t">12:30<div class="kt">(한국 19:30)</div></td><td class="p">출국심사</td></tr><tr><td class="t">13:30<div class="kt">(한국 20:30)</div></td><td class="p">출국장 대기 겸 중식</td></tr><tr><td class="t">14:30<div class="kt">(한국 21:30)</div></td><td class="p">OS544 보딩 / 14:35 이륙 (베네치아 → 빈)</td></tr><tr><td class="t">15:30<div class="kt">(한국 22:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Vienna+International+Airport" target="_blank" rel="noopener">빈 국제공항(VIE)</a> 랜딩(15:40착) / T3</td></tr><tr><td class="t">16:00<div class="kt">(한국 23:00)</div></td><td class="p">입국심사</td></tr><tr><td class="t">16:30<div class="kt">(한국 23:30)</div></td><td class="p">우버 이동</td></tr><tr><td class="t">17:00<div class="kt">(한국 익일 00:00)</div></td><td class="p">호텔 체크인 / 정비 — <a class="maploc" href="https://maps.app.goo.gl/bC6YHXjFnSmsi1CR8" target="_blank" rel="noopener">그라벤 호텔</a><div class="memo info">주소: Dorotheergasse 3, 인네레슈타트, 1010 비엔나, 오스트리아</div></td></tr><tr><td class="t">17:30<div class="kt">(한국 익일 00:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=St.+Stephen%E2%80%99s+Cathedral+Vienna" target="_blank" rel="noopener">성 슈테판 대성당</a><div class="memo info">본당 무료구역은 가볍게 관람 가능하나 가이드구역·남탑·북탑·카타콤 등 세부 입장은 유료. 17:30 전후 노을빛 외관 사진 명당</div><div class="hist">📜 1147년 로마네스크 양식으로 처음 봉헌되었고, 현재의 고딕 양식은 14~15세기에 재건되었다. 137m 높이의 남탑("슈테플")은 137년에 걸쳐 완공되었으며, 137단 계단을 올라야 종탑에 닿는다. 형형색색 23만 장의 유약 기와로 덮인 지붕에는 합스부르크 제국의 쌍두독수리 문양이 새겨져 있고, 1782년 모차르트가 이곳에서 콘스탄체와 결혼식을 올렸다. 지하 카타콤에는 합스부르크 황실의 내장을 담은 단지들과 함께 18세기 흑사병 희생자 등 수만 구의 유골이 안치되어 있다. 북탑의 대종 "푸메린"은 1711년 오스만군에게서 노획한 대포를 녹여 주조했으나 1945년 화재로 추락해 파손되었고, 1951년 같은 청동을 재활용해 다시 만들었다. 성당 외벽의 "치통의 예수상"은 술 취한 이들이 조롱하자 갑자기 심한 치통을 앓았다는 전설에서 이름 붙었다. 1945년 지붕을 태운 화재는 연합군 폭격이 아니라 후퇴하던 독일군과 소련군의 시가전 중 발생한 것으로 추정된다.</div></td></tr><tr><td class="t">18:30<div class="kt">(한국 익일 01:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=K%C3%A4rntner+Stra%C3%9Fe+Vienna" target="_blank" rel="noopener">케른트너 거리</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Graben+Vienna" target="_blank" rel="noopener">그라벤 거리</a> / <a class="maploc" href="https://maps.app.goo.gl/cRynpwKAKkEt2jEK6" target="_blank" rel="noopener">콜마르크트 거리</a><div class="memo info">슈테판 대성당 → 케른트너 → 그라벤 → 콜마르크트로 이어지는 빈 최고의 보행자 거리. 18:15 일몰 이후 가로등·상점 조명이 켜지며 로맨틱한 분위기</div><div class="hist">📜 그라벤 거리는 로마 시대 빈 요새의 해자("Graben"=도랑)가 있던 자리로, 중앙의 흑사병 기념탑(Pestsäule, 1679~1693)은 대역병에서 벗어난 것을 감사하며 레오폴트 1세가 세운 바로크 걸작이다. 콜마르크트("숯 시장")는 중세 숯 거래시장에서, 케른트너 거리는 케른텐 지방으로 향하는 옛 가도에서 이름이 유래했다. 흑사병 기념탑은 원래 조각가 마티아스 라우크뮐러가 설계했으나 1686년 그의 사망 후 요한 베른하르트 피셔 폰 에를라흐가 이어받아 완성했다. 탑 앞에서 무릎 꿇고 기도하는 레오폴트 1세 상에는 합스부르크 가문 특유의 처진 아래턱이 뚜렷이 표현되어 있다. 콜마르크트는 로마 시대 빈도보나 요새의 남서쪽 문에서 이어지던 옛 간선도로 자리였으며, 하이든과 쇼팽도 한때 이 거리에 거주했다. 그라벤 거리에는 건축가 아돌프 로스가 설계한 아르누보 양식의 공중화장실이 지금도 남아 있어 "예술이 된 화장실"로 불린다.</div></td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Peterskirche+Vienna" target="_blank" rel="noopener">페터 성당</a><div class="memo info">그라벤 거리 한복판, 내부가 매우 화려. 폐관 전 조용히 감상 좋음</div><div class="hist">📜 전설에 따르면 792년 샤를마뉴 대제가 세운 빈 최초의 성당 자리로 전해지며, 현재의 바로크 건물은 1733년 요한 루카스 폰 힐데브란트가 완공했다. 슈테판 대성당 다음으로 오래된 빈의 교회로, 타원형 돔 천장의 프레스코화(성모승천, 1714년 로트마이어 작)가 화려하기로 손꼽힌다. 현재의 바로크 건물은 1679~1680년 대흑사병 종식에 감사하며 레오폴트 1세가 세운 서원에서 비롯되었다. 원래 안드레아 포초가 돔 프레스코를 그렸으나 그의 사후 철거되었고, 1713년 로트마이어가 완전히 새로 그린 것이 지금의 "성모 대관식"이다. 1733년 한 추기경이 로마 카타콤에서 가져온 순교자 유해를 기증해, 유리관에 안치된 모습으로 곁 제단에 남아 있다.</div></td></tr><tr><td class="t">20:00<div class="kt">(한국 익일 03:00)</div></td><td class="p">석식 (<a class="maploc" href="https://maps.app.goo.gl/3EgKFJpSfnQ9Zuwi7" target="_blank" rel="noopener">피그뮐러 (슈니첼)</a>)<div class="memo info">예약 완료</div></td></tr><tr><td class="t">21:30<div class="kt">(한국 익일 04:30)</div></td><td class="p">거리 야경 산책</td></tr><tr><td class="t">22:30<div class="kt">(한국 익일 05:30)</div></td><td class="p">숙소 복귀 — <a class="maploc" href="https://maps.app.goo.gl/bC6YHXjFnSmsi1CR8" target="_blank" rel="noopener">그라벤 호텔</a></td></tr><tr><td class="t">23:00<div class="kt">(한국 익일 06:00)</div></td><td class="p">정비 / 휴식</td></tr><tr><td class="t">00:00<div class="kt">(한국 07:00)</div></td><td class="p">취침 (6H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d10" class="day-panel">
+<div class="card">
+<h2>Day10 · 10/10(토) 빈 종일 관광 (호프부르크 · 벨베데레 · 카를성당)</h2>
+<div class="daymeta" data-wx-day="d10">🌅 일출 07:06 · 🌇 일몰 18:15 · 🌡️ <span id="wxCond-d10-0" class="wx-cond"></span><span id="wxTemp-d10-0" class="wx-temp">예상 19/6°C</span></div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>호프부르크·시시미술관 입장권/오디오가이드 언어 현장 재확인</li><li>카를 성당 일몰(18:15) 포토타임에 맞춰 동선 조정</li><li>오늘 저녁은 18:00까지 호텔 복귀해 즉석 한식으로 진행</li></ul></div>
+
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">조식 / 정비</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p">휴식 / 산책</td></tr><tr><td class="t">09:00<div class="kt">(한국 16:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Hofburg+Palace+Vienna" target="_blank" rel="noopener">호프부르크 왕궁</a> & <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Sisi+Museum+Vienna" target="_blank" rel="noopener">시시 미술관</a><div class="memo info">오스트리아가 사랑한 엘리자베스(시시) 황후의 유품과 황실 식기, 주거공간 관람. 오디오가이드(한국어 지원 포함, 최신 안내 기준) 제공 — <span class="small">※ 이전 조사 시점에는 한국어 미지원으로 확인된 바 있어 현장에서 재확인 권장</span></div><div class="hist">📜 13세기부터 640년간 합스부르크 왕가의 겨울궁전이었던 곳으로, 18개 건물군과 19개 정원이 증축을 거듭해 지금의 규모를 이뤘다. 시시 미술관은 1854년 16세의 나이로 프란츠 요제프 1세와 결혼한 엘리자베트 황후("시시")의 삶을 다루며, 그녀는 극심한 다이어트와 자유분방한 행보로 당대 유럽 왕실의 파격이었으나 1898년 제네바에서 이탈리아 무정부주의자에게 암살당했다. 왕궁 보물관에는 "성배"로 전해지는 마노 접시와 "유니콘의 뿔"로 여겨졌던 일각고래 이빨이 합스부르크 가문의 보물로 소장되어 있다. 1938년 오스트리아 병합 후 나치 독일이 이 보물들을 독일로 옮겼으나 종전 후 미군이 되찾아 빈으로 반환했다. 1898년 제네바에서 시시는 삼각 줄에 심장을 찔렸으나 곧바로 일어나 배에 올라탔고, 시녀가 코르셋을 풀어주다 핏자국을 발견하고서야 자상이 드러났다고 전해진다. 그녀는 매일 몇 시간씩 체조로 몸매를 관리했고 특별한 미용법으로 머리를 감았다고 전해진다.</div></td></tr><tr><td class="t">11:30<div class="kt">(한국 18:30)</div></td><td class="p">중식 / 휴식<div class="memo info">추천: 호프부르크 인근 <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Caf%C3%A9+Central+Vienna" target="_blank" rel="noopener">카페 센트랄</a> 또는 <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Caf%C3%A9+Demel+Vienna" target="_blank" rel="noopener">카페 데멜</a>에서 아인슈페너·멜랑주 커피, 자허토르테 즐기기</div><div class="hist">📜 카페 센트랄(1876년 개업)은 페리클레스풍 기둥과 아치형 천장이 장관인 궁전 카페로, 트로츠키와 프로이트가 단골로 체스를 두던 곳으로 유명하다. 카페 데멜(1786년 창업)은 합스부르크 황실 御用 제과점으로, 자허토르테의 원조를 둘러싸고 호텔 자허와 100년 가까이 법적 분쟁("자허토르테 전쟁")을 벌인 것으로도 잘 알려져 있다. 카페 센트랄 입구에는 실물 크기의 작가 페터 알텐베르크 좌상이 있는데, 그가 이곳을 거의 집처럼 여기며 우편물까지 카페로 받았다는 일화를 기린 것이다. 트로츠키가 이곳에서 커피를 마시던 시절, 한 오스트리아 외무장관이 "혁명을 이끌 사람이 대체 누구란 말인가, 저기 앉아 커피나 마시는 사람?"이라며 비웃었다는 일화는 훗날 실제 혁명이 일어나며 유명해졌다. 카페 데멜의 여종업원들은 수녀복을 닮은 검은 제복 때문에 특별한 별칭으로 불렸다. 프란츠 요제프 1세는 데멜에서 즐겨 시시 황후에게 편지를 썼고, 시시는 이곳의 제비꽃 셔벗을 특히 좋아했다고 전해진다.</div></td></tr><tr><td class="t">13:00<div class="kt">(한국 20:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Maria-Theresien-Platz+Vienna" target="_blank" rel="noopener">마리아 테레지아 광장</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Austrian+Parliament+Building+Vienna" target="_blank" rel="noopener">오스트리아 국회</a> / <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Vienna+City+Hall" target="_blank" rel="noopener">시청사</a><div class="memo info">호프부르크 뒤편 링슈트라세를 따라 웅장한 역사적 건축물을 도보로 감상</div><div class="hist">📜 마리아 테레지아 광장의 동상(1888)은 합스부르크 유일의 여성 군주였던 마리아 테레지아 여제를 기린다. 국회의사당(1883)은 고대 그리스 민주주의를 상징하는 그리스 신전 양식으로 테오필 한젠이 설계했으며, 시청사(1883)는 대조적으로 첨탑이 인상적인 네오고딕 양식으로 지어져 링슈트라세 건축 양식의 다양성을 잘 보여준다. 국회의사당 앞 팔라스 아테나 분수는 건물 완공(1883) 후 20년 가까이 지난 1902년에야 세워져, 지혜의 여신이 뒤늦게 합류한 셈이다. 시청사 첨탑은 인근 성당보다 높으면 안 된다는 황제의 요구로 낮게 지어졌으나, 건축가는 그 위에 창을 든 기사상 "라트하우스만"을 얹어 결과적으로 제한을 넘어섰다. 이 동상은 구리판으로 제작되었으며, 1882년 도르래와 증기 기관을 이용해 하루 만에 첨탑 위로 끌어올려졌다.</div></td></tr><tr><td class="t">14:00<div class="kt">(한국 21:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Belvedere+Palace+Vienna" target="_blank" rel="noopener">벨베데레 궁전 상궁</a><div class="memo info">시청사/호프부르크에서 도보 20~25분(중간에 빈 국립 오페라극장 외관 통과). 구스타프 클림트의 <키스> 전시. 일몰 전 채광 좋을 때 방문해 정원 산책 병행</div><div class="hist">📜 오스만제국을 물리친 전쟁영웅 오이겐 왕자의 여름 별궁으로 1717~1723년 건축가 요한 루카스 폰 힐데브란트가 설계했다. 상궁과 하궁 사이 프랑스식 정원이 펼쳐지며, 구스타프 클림트의 대표작 <키스>(1908~1909)를 비롯해 에곤 실레 등 오스트리아 표현주의 회화의 최대 컬렉션을 소장하고 있다. 오이겐 왕자는 정식 유언장 없이 사망해, 황제가 임명한 위원회가 조카딸을 상속인으로 정했다. 1752년 마리아 테레지아가 벨베데레를 사들여 황실 회화 컬렉션을 옮겼고, 1777년 상궁을 일반에 공개해 세계 최초의 공공미술관 중 하나가 되었다. 1955년 5월 상궁 대리석 홀에서 오스트리아 국가조약이 체결되어 주권을 되찾았고, 당시 외무장관이 발코니에서 "오스트리아는 자유다"를 외친 장면은 지금도 국가적 상징으로 남아 있다.</div></td></tr><tr><td class="t">16:30<div class="kt">(한국 23:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Karlskirche+Vienna" target="_blank" rel="noopener">카를 광장 / 카를 성당</a><div class="memo info">빈에서 가장 아름다운 바로크 성당. 앞 연못에 비치는 성당과 노을(18:15)이 어우러지는 풍경이 백미. 내부 전망대 엘리베이터로 돔 위 조망 가능</div><div class="hist">📜 1713년 빈을 휩쓴 대규모 흑사병이 종식되면 성당을 짓겠다는 황제 카를 6세의 서원에 따라 건축가 요한 베른하르트 피셔 폰 에를라흐가 설계, 1737년 완공했다. 두 개의 거대한 기둥은 로마 트라야누스 기둥을 본떠 성 카를로 보로메오의 생애를 나선형 부조로 새겼다. 돔 천장화는 요한 미하엘 로트마이어의 프레스코화(1730년경). 설계자 요한 베른하르트 피셔 폰 에를라흐는 완공 전인 1723년 사망했고, 아들 요제프 에마누엘이 돔 설계를 일부 변경해 1737년 공사를 마쳤다. 작곡가 비발디는 1741년 빈에서 극빈자로 사망해 인근 시립 빈민묘지에 묻혔으나 정확한 무덤 위치는 남아있지 않다. 1933년 배우 헤디 라마르가 이곳에서 결혼식을 올려 많은 귀빈이 참석했다. 성당 앞 연못에는 현대 조각가 헨리 무어의 작품(1978년 설치)이 있어 바로크 건축과 대비를 이룬다.</div></td></tr><tr><td class="t">18:00<div class="kt">(한국 익일 01:00)</div></td><td class="p">숙소 복귀 — <a class="maploc" href="https://maps.app.goo.gl/bC6YHXjFnSmsi1CR8" target="_blank" rel="noopener">그라벤 호텔</a> / 석식 (즉석 한식)</td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Albertina+Museum+Vienna" target="_blank" rel="noopener">알베르티나 테라스</a></td></tr><tr><td class="t">20:30<div class="kt">(한국 익일 03:30)</div></td><td class="p">거리 야경 산책<div class="memo info">알베르티나 미술관 앞 에스컬레이터로 테라스에 오르면 불 켜진 빈 국립 오페라극장 뒤편 야경 조망 — 빈 최고의 야경 포토존</div></td></tr><tr><td class="t">22:30<div class="kt">(한국 익일 05:30)</div></td><td class="p">숙소 복귀 — <a class="maploc" href="https://maps.app.goo.gl/bC6YHXjFnSmsi1CR8" target="_blank" rel="noopener">그라벤 호텔</a></td></tr><tr><td class="t">23:00<div class="kt">(한국 익일 06:00)</div></td><td class="p">정비 / 휴식</td></tr><tr><td class="t">00:00<div class="kt">(한국 07:00)</div></td><td class="p">취침 (6H)</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d11" class="day-panel">
+<div class="card">
+<h2>Day11 · 10/11(일) 빈 마무리 관광 → 저녁 KE938편으로 인천행 출발</h2>
+<div class="daymeta" data-wx-day="d11">🌅 일출 07:08 · 🌇 일몰 18:13 · 🌡️ <span id="wxCond-d11-0" class="wx-cond"></span><span id="wxTemp-d11-0" class="wx-temp">예상 20/6°C</span> · 빈 기준(출국일)</div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>오전 체크아웃 전 짐 보관 데스크 위치 확인</li><li>빈 미술사박물관은 오전 시간대 상대적으로 여유</li><li>공항 이동 전 마지막 환전/기념품 구매 마무리</li><li>기내에서 시차 적응을 위해 착륙 예정시각(익일 12:30) 기준 수면 스케줄 조정 권장</li></ul></div>
+<div class="alert info">✈️ <b>항공편 안내</b><br><b>KE938</b> 빈(VIE) → 인천(ICN) T2 · 보딩 18:30 / 이륙 19:00 · 익일 랜딩 12:30(한국시각) · 총 비행 약 11시간30분</div>
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">06:00<div class="kt">(한국 13:00)</div></td><td class="p">기상 / 세수</td></tr><tr><td class="t">07:00<div class="kt">(한국 14:00)</div></td><td class="p">조식 / 정비</td></tr><tr><td class="t">08:00<div class="kt">(한국 15:00)</div></td><td class="p">사전 체크아웃 / 짐 보관</td></tr><tr><td class="t">08:30<div class="kt">(한국 15:30)</div></td><td class="p">휴식 / 산책</td></tr><tr><td class="t">09:00<div class="kt">(한국 16:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Burggarten+Vienna" target="_blank" rel="noopener">플라크 / 왕궁정원(부르크가르텐)</a><div class="memo info">일요일 아침의 한적한 궁전 정원 산책, 모차르트 동상과 음자리표 모양 꽃밭에서 기념사진</div><div class="hist">📜 원래 프란츠 1세의 사적인 궁정 정원으로 1819년 조성되었다가 1919년 일반에 개방되었다. 1896년 세워진 모차르트 동상은 원래 다른 광장에 있다가 1953년 현재 위치로 옮겨졌으며, 동상 앞 화단이 음자리표(솔음자리) 모양으로 조성되어 있다. 정원 한쪽에는 온실을 개조한 나비하우스(Schmetterlinghaus)도 있다. 모차르트 동상은 원래 1896년 다른 광장에 세워졌으나, 조각가는 제막 5일 전 세상을 떠나 완성을 보지 못했다. 1945년 연합군 폭격으로 동상이 파손되었고, 복구를 거쳐 1953년 지금의 부르크가르텐으로 옮겨졌다. 동상 뒷면에는 어린 모차르트가 아버지, 누나와 연주하는 모습이, 정면에는 오페라 <돈 조반니> 장면이 부조로 새겨져 있다.</div></td></tr><tr><td class="t">10:00<div class="kt">(한국 17:00)</div></td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Kunsthistorisches+Museum+Wien" target="_blank" rel="noopener">빈 미술사 박물관</a><div class="memo info">세계 3대 미술관 중 하나, 합스부르크가 수집한 방대한 예술품과 피터 브뢰헬의 <바벨탑> 등 전시. 내부의 아름다운 "카페-레스토랑" 돔 아래에서 티타임/브런치 추천</div><div class="hist">📜 합스부르크 왕가가 수백 년간 수집한 방대한 예술품을 소장하기 위해 1871~1891년 고트프리트 젬퍼와 카를 폰 하제나우어가 설계해 완공했다. 쌍둥이 건물인 자연사박물관과 마리아 테레지아 광장을 사이에 두고 마주 본다. 피터 브뢰헬의 현존 작품 중 최대 컬렉션(12점)을 보유하며 대표작 <바벨탑>(1563)과 <눈 속의 사냥꾼>이 특히 유명하다. 대계단 벽면 스팽드럴 그림 일부는 아직 무명이던 젊은 구스타프 클림트가 형, 동료와 결성한 "화가 조합" 시절인 1891년에 그린 것이다. 2003년 벤베누토 첼리니의 황금 소금통 "살리에라"가 공사 중이던 박물관에서 도난당했으나 2006년 빈 근교 숲속에 묻힌 채 회수되었다. 범인은 감시카메라 사진이 지인들에게 알려지며 자수했으며, 살리에라의 보험 평가액은 약 6천만 달러에 달한다.</div></td></tr><tr><td class="t">12:30<div class="kt">(한국 19:30)</div></td><td class="p">숙소 짐 찾기 — <a class="maploc" href="https://maps.app.goo.gl/bC6YHXjFnSmsi1CR8" target="_blank" rel="noopener">그라벤 호텔</a></td></tr><tr><td class="t">13:00<div class="kt">(한국 20:00)</div></td><td class="p">중식</td></tr><tr><td class="t">14:00<div class="kt">(한국 21:00)</div></td><td class="p">우버 이동 — <a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Vienna+International+Airport" target="_blank" rel="noopener">빈 국제공항 T3</a></td></tr><tr><td class="t">14:30<div class="kt">(한국 21:30)</div></td><td class="p">티타임</td></tr><tr><td class="t">15:30<div class="kt">(한국 22:30)</div></td><td class="p">출국심사</td></tr><tr><td class="t">16:30<div class="kt">(한국 23:30)</div></td><td class="p">휴식시간</td></tr><tr><td class="t">17:30<div class="kt">(한국 익일 00:30)</div></td><td class="p">출국장 대기</td></tr><tr><td class="t">18:30<div class="kt">(한국 익일 01:30)</div></td><td class="p">KE938 보딩 / 19:00 이륙 (빈 → 인천)</td></tr><tr><td class="t">19:30<div class="kt">(한국 익일 02:30)</div></td><td class="p">항로이동 (야간비행) — 익일 10/12(월) 12:30(한국시각) 인천 랜딩 예정, 자세한 도착 일정은 Day12 참조</td></tr></tbody></table>
+</div>
+</div>
+
+<div id="d12" class="day-panel">
+<div class="card">
+<h2>Day12 · 10/12(월) 인천 착륙 → 입국 → 귀가 (전체 한국현지시간 기준)</h2>
+<div class="daymeta" data-wx-day="d12">🌅 일출 06:39 · 🌇 일몰 18:01 · 🌡️ <span id="wxCond-d12-0" class="wx-cond"></span><span id="wxTemp-d12-0" class="wx-temp">예상 22/13°C</span> · 인천 기준(귀국일)</div>
+<div class="brief"><b>📋 이 날의 체크포인트</b><ul><li>본 페이지의 모든 시간은 한국현지시간(KST) 기준으로 재정리됨</li><li>KE938편 12:30 랜딩(T2) 기준 — 입국심사·수하물 수령 후 여유있게 귀가</li><li>위탁수하물 태그 재확인, 분실 시 공항 내 수하물서비스센터 즉시 접수</li><li>장기 여행 후 첫 식사·휴식 계획 미리 정해두면 편함</li></ul></div>
+
+<h3>⏱ 상세 일정</h3>
+<table class="sched"><thead><tr><th style="width:78px">시간</th><th>활동 / 장소 / 메모</th></tr></thead><tbody><tr><td class="t">12:30</td><td class="p"><a class="maploc" href="https://www.google.com/maps/search/?api=1&query=Incheon+International+Airport+Terminal+2" target="_blank" rel="noopener">인천공항 제2터미널(T2)</a> 랜딩 — KE938편 도착</td></tr><tr><td class="t">13:00</td><td class="p">입국심사</td></tr><tr><td class="t">13:30</td><td class="p">수하물 수령</td></tr><tr><td class="t">14:00</td><td class="p">귀가 이동</td></tr><tr><td class="t">15:30</td><td class="p">집 도착</td></tr></tbody></table>
+</div>
+</div>
+<div id="trans" class="day-panel">
+<div class="card">
+<h2>🌐 통역 (양방향 대화 모드)</h2>
+<p class="small">① 상대방의 언어를 먼저 선택 → ② 대화 상황에 맞는 마이크를 누르기: 내가 말할 땐 왼쪽 <b>"나(한국어)"</b>, 상대방이 말할 땐 오른쪽 <b>"상대방"</b> 마이크 → ③ 말이 끝나고 잠시 멈추면 자동으로 인식이 종료되며 → ④ 번역 문장과 표준 원어민 발음·억양의 음성이 함께 나오고, 아래 대화 기록에 순서대로 쌓입니다(인터넷 연결 필요). 직접 입력 후 Enter 또는 "변환"으로도 실행할 수 있습니다.</p>
+<div class="trans-box">
+<div class="trans-controls">
+<label class="trans-lang-label" for="transLang">상대방 언어</label>
+<select id="transLang">
+<option value="en">🇬🇧 영어</option>
+<option value="fr">🇫🇷 프랑스어</option>
+<option value="it">🇮🇹 이탈리아어</option>
+<option value="de">🇦🇹 독일어</option>
+</select>
+</div>
+
+<div class="dialog-mics">
+<button id="transMicKo" class="dialog-mic-btn" type="button" title="내가 한국어로 말하기">
+<span class="dialog-mic-icon">🎤</span><span class="dialog-mic-label">나 (한국어)</span>
+</button>
+<div class="dialog-arrow">⇄</div>
+<button id="transMicForeign" class="dialog-mic-btn" type="button" title="상대방이 말하기">
+<span class="dialog-mic-icon">🎤</span><span class="dialog-mic-label" id="transMicForeignLabel">상대방 (영어)</span>
+</button>
+</div>
+
+<div class="trans-input-row">
+<textarea id="transInput" rows="2" placeholder="직접 입력도 가능합니다 (한국어 → 상대방 언어로 번역됩니다)"></textarea>
+</div>
+<div class="trans-controls">
+<button id="transBtn" class="trans-go" type="button">변환</button>
+<button id="transClear" class="trans-clear" type="button">대화 기록 지우기</button>
+</div>
+
+<div id="transOutput" class="trans-output">마이크를 누르거나 문장을 입력해보세요.</div>
+<div id="transLog" class="trans-log"></div>
+<div class="trans-hint">※ 자동 번역 결과이므로 상황에 따라 뉘앙스가 다를 수 있습니다. 응급 상황 등 중요한 의사소통은 🆘 긴급연락처 탭을 함께 활용하세요. 마이크 기능은 Chrome/Edge 브라우저에서 지원되며, 말을 마치고 잠시 멈추면 브라우저가 자동으로 인식을 종료합니다(정확히 1초로 고정할 수는 없으나 짧은 침묵을 자동 감지합니다). 대화 기록은 이 페이지를 새로고침하면 사라집니다.</div>
+</div>
+</div>
+
+<div class="lang-subtabs">
+<button class="lang-tab-btn active" data-lang-tab="langen" type="button">🇬🇧 영어</button>
+<button class="lang-tab-btn" data-lang-tab="langfr" type="button">🇫🇷 프랑스어</button>
+<button class="lang-tab-btn" data-lang-tab="langit" type="button">🇮🇹 이탈리아어</button>
+<button class="lang-tab-btn" data-lang-tab="langde" type="button">🇦🇹 독일어</button>
+</div>
+<div id="langen" class="lang-panel active"><div class="card">
+<h2>🇬🇧 영어 여행 회화 20</h2>
+<p class="small">원문 옆 🔊 버튼을 누르면 실제 원어민 성우 음성 엔진(Amazon Polly 등)으로 표준 발음·억양을 적당한 속도로 들을 수 있습니다(인터넷 연결 필요). 재생이 안 될 경우 버튼이 잠시 붉게 표시되며, 이때는 인터넷 연결을 확인해주세요 — 어색한 기기 음성으로는 대체 재생하지 않습니다.</p>
+<table class="phrase-table"><thead><tr><th style="width:30%">상황 / 의미</th><th>English</th></tr></thead><tbody><tr><td>안녕하세요</td><td>Hello <button class="spk" data-say="Hello" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>안녕히 가세요</td><td>Goodbye <button class="spk" data-say="Goodbye" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>감사합니다</td><td>Thank you <button class="spk" data-say="Thank you" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>천만에요</td><td>You're welcome <button class="spk" data-say="You're welcome" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>죄송합니다 / 실례합니다</td><td>Excuse me / Sorry <button class="spk" data-say="Excuse me / Sorry" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>네 / 아니오</td><td>Yes / No <button class="spk" data-say="Yes / No" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>영어 하세요?</td><td>Do you speak English? <button class="spk" data-say="Do you speak English?" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>이거 얼마예요?</td><td>How much is this? <button class="spk" data-say="How much is this?" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>화장실이 어디예요?</td><td>Where is the restroom? <button class="spk" data-say="Where is the restroom?" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>도와주세요</td><td>Please help me <button class="spk" data-say="Please help me" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>물 한 잔 주세요</td><td>A glass of water, please <button class="spk" data-say="A glass of water, please" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>계산서 주세요</td><td>The bill, please <button class="spk" data-say="The bill, please" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>맛있어요</td><td>It's delicious <button class="spk" data-say="It's delicious" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>사진 좀 찍어주시겠어요?</td><td>Could you take a photo for me? <button class="spk" data-say="Could you take a photo for me?" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>예약했어요</td><td>I have a reservation <button class="spk" data-say="I have a reservation" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>여권을 잃어버렸어요</td><td>I lost my passport <button class="spk" data-say="I lost my passport" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>경찰을 불러주세요</td><td>Please call the police <button class="spk" data-say="Please call the police" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>응급상황이에요</td><td>It's an emergency <button class="spk" data-say="It's an emergency" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>병원이 어디예요?</td><td>Where is the hospital? <button class="spk" data-say="Where is the hospital?" data-lang="en" title="발음 듣기">🔊</button></td></tr><tr><td>사랑해요</td><td>I love you <button class="spk" data-say="I love you" data-lang="en" title="발음 듣기">🔊</button></td></tr></tbody></table>
+</div></div>
+<div id="langfr" class="lang-panel"><div class="card">
+<h2>🇫🇷 프랑스어 여행 회화 20</h2>
+<p class="small">원문 옆 🔊 버튼을 누르면 실제 원어민 성우 음성 엔진(Amazon Polly 등)으로 표준 발음·억양을 적당한 속도로 들을 수 있습니다(인터넷 연결 필요). 재생이 안 될 경우 버튼이 잠시 붉게 표시되며, 이때는 인터넷 연결을 확인해주세요 — 어색한 기기 음성으로는 대체 재생하지 않습니다. 한글 독음은 실제 발음과 다소 차이가 있을 수 있어 참고용으로만 활용하세요.</p>
+<table class="phrase-table"><thead><tr><th style="width:26%">상황 / 의미</th><th style="width:38%">프랑스어</th><th>한글 독음</th></tr></thead><tbody><tr><td>안녕하세요</td><td>Bonjour <button class="spk" data-say="Bonjour" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">봉주르</td></tr><tr><td>안녕히 가세요</td><td>Au revoir <button class="spk" data-say="Au revoir" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">오 흐부아</td></tr><tr><td>감사합니다</td><td>Merci <button class="spk" data-say="Merci" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">메흐시</td></tr><tr><td>천만에요</td><td>Je vous en prie <button class="spk" data-say="Je vous en prie" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">쥬 부정 프리</td></tr><tr><td>죄송합니다 / 실례합니다</td><td>Excusez-moi / Pardon <button class="spk" data-say="Excusez-moi / Pardon" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">엑스퀴제무아 / 빠흐동</td></tr><tr><td>네 / 아니오</td><td>Oui / Non <button class="spk" data-say="Oui / Non" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">위 / 농</td></tr><tr><td>영어 하세요?</td><td>Parlez-vous anglais? <button class="spk" data-say="Parlez-vous anglais?" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">빠흘레부 앙글레?</td></tr><tr><td>이거 얼마예요?</td><td>Combien ça coûte? <button class="spk" data-say="Combien ça coûte?" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">꽁비앙 사 꾸뜨?</td></tr><tr><td>화장실이 어디예요?</td><td>Où sont les toilettes? <button class="spk" data-say="Où sont les toilettes?" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">우 쏭 레 뚜알레뜨?</td></tr><tr><td>도와주세요</td><td>Aidez-moi, s'il vous plaît <button class="spk" data-say="Aidez-moi, s'il vous plaît" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">에데무아 씰부쁠레</td></tr><tr><td>물 한 잔 주세요</td><td>Un verre d'eau, s'il vous plaît <button class="spk" data-say="Un verre d'eau, s'il vous plaît" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">앙 베흐 도 씰부쁠레</td></tr><tr><td>계산서 주세요</td><td>L'addition, s'il vous plaît <button class="spk" data-say="L'addition, s'il vous plaît" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">라디씨옹 씰부쁠레</td></tr><tr><td>맛있어요</td><td>C'est délicieux <button class="spk" data-say="C'est délicieux" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">쎄 델리씨외</td></tr><tr><td>사진 좀 찍어주시겠어요?</td><td>Pourriez-vous prendre une photo? <button class="spk" data-say="Pourriez-vous prendre une photo?" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">뿌히에부 프헝드흐 윈 포토?</td></tr><tr><td>예약했어요</td><td>J'ai une réservation <button class="spk" data-say="J'ai une réservation" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">줴 윈 레제흐바씨옹</td></tr><tr><td>여권을 잃어버렸어요</td><td>J'ai perdu mon passeport <button class="spk" data-say="J'ai perdu mon passeport" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">줴 뻬흐뒤 몽 빠스포흐</td></tr><tr><td>경찰을 불러주세요</td><td>Appelez la police, s'il vous plaît <button class="spk" data-say="Appelez la police, s'il vous plaît" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">아쁠레 라 뽈리스 씰부쁠레</td></tr><tr><td>응급상황이에요</td><td>C'est une urgence <button class="spk" data-say="C'est une urgence" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">쎄 튄 위흐정스</td></tr><tr><td>병원이 어디예요?</td><td>Où est l'hôpital? <button class="spk" data-say="Où est l'hôpital?" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">우 에 로피딸?</td></tr><tr><td>사랑해요</td><td>Je t'aime <button class="spk" data-say="Je t'aime" data-lang="fr" title="발음 듣기">🔊</button></td><td class="small">쥬 뗌므</td></tr></tbody></table>
+</div></div>
+<div id="langit" class="lang-panel"><div class="card">
+<h2>🇮🇹 이탈리아어 여행 회화 20</h2>
+<p class="small">원문 옆 🔊 버튼을 누르면 실제 원어민 성우 음성 엔진(Amazon Polly 등)으로 표준 발음·억양을 적당한 속도로 들을 수 있습니다(인터넷 연결 필요). 재생이 안 될 경우 버튼이 잠시 붉게 표시되며, 이때는 인터넷 연결을 확인해주세요 — 어색한 기기 음성으로는 대체 재생하지 않습니다. 한글 독음은 실제 발음과 다소 차이가 있을 수 있어 참고용으로만 활용하세요.</p>
+<table class="phrase-table"><thead><tr><th style="width:26%">상황 / 의미</th><th style="width:38%">이탈리아어</th><th>한글 독음</th></tr></thead><tbody><tr><td>안녕하세요</td><td>Buongiorno <button class="spk" data-say="Buongiorno" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">부온조르노</td></tr><tr><td>안녕히 가세요</td><td>Arrivederci <button class="spk" data-say="Arrivederci" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">아리베데르치</td></tr><tr><td>감사합니다</td><td>Grazie <button class="spk" data-say="Grazie" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">그라찌에</td></tr><tr><td>천만에요</td><td>Prego <button class="spk" data-say="Prego" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">프레고</td></tr><tr><td>죄송합니다 / 실례합니다</td><td>Mi scusi / Scusa <button class="spk" data-say="Mi scusi / Scusa" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">미 스쿠지 / 스쿠자</td></tr><tr><td>네 / 아니오</td><td>Sì / No <button class="spk" data-say="Sì / No" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">씨 / 노</td></tr><tr><td>영어 하세요?</td><td>Parla inglese? <button class="spk" data-say="Parla inglese?" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">빠를라 잉글레제?</td></tr><tr><td>이거 얼마예요?</td><td>Quanto costa? <button class="spk" data-say="Quanto costa?" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">꽌또 꼬스따?</td></tr><tr><td>화장실이 어디예요?</td><td>Dov'è il bagno? <button class="spk" data-say="Dov'è il bagno?" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">도베 일 바뇨?</td></tr><tr><td>도와주세요</td><td>Mi aiuti, per favore <button class="spk" data-say="Mi aiuti, per favore" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">미 아유티 뻬르 파보레</td></tr><tr><td>물 한 잔 주세요</td><td>Un bicchiere d'acqua, per favore <button class="spk" data-say="Un bicchiere d'acqua, per favore" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">운 비끼에레 다꾸아 뻬르 파보레</td></tr><tr><td>계산서 주세요</td><td>Il conto, per favore <button class="spk" data-say="Il conto, per favore" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">일 꼰또 뻬르 파보레</td></tr><tr><td>맛있어요</td><td>È delizioso <button class="spk" data-say="È delizioso" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">에 델리찌오조</td></tr><tr><td>사진 좀 찍어주시겠어요?</td><td>Potrebbe farmi una foto? <button class="spk" data-say="Potrebbe farmi una foto?" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">뽀뜨레베 파르미 우나 포또?</td></tr><tr><td>예약했어요</td><td>Ho una prenotazione <button class="spk" data-say="Ho una prenotazione" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">오 우나 쁘레노따찌오네</td></tr><tr><td>여권을 잃어버렸어요</td><td>Ho perso il passaporto <button class="spk" data-say="Ho perso il passaporto" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">오 뻬르소 일 빠싸뽀르또</td></tr><tr><td>경찰을 불러주세요</td><td>Chiami la polizia, per favore <button class="spk" data-say="Chiami la polizia, per favore" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">끼아미 라 뽈리찌아 뻬르 파보레</td></tr><tr><td>응급상황이에요</td><td>È un'emergenza <button class="spk" data-say="È un'emergenza" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">에 운 에메르젠자</td></tr><tr><td>병원이 어디예요?</td><td>Dov'è l'ospedale? <button class="spk" data-say="Dov'è l'ospedale?" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">도베 로스뻬달레?</td></tr><tr><td>사랑해요</td><td>Ti amo <button class="spk" data-say="Ti amo" data-lang="it" title="발음 듣기">🔊</button></td><td class="small">띠 아모</td></tr></tbody></table>
+</div></div>
+<div id="langde" class="lang-panel"><div class="card">
+<h2>🇦🇹 독일어 여행 회화 20</h2>
+<p class="small">원문 옆 🔊 버튼을 누르면 실제 원어민 성우 음성 엔진(Amazon Polly 등)으로 표준 발음·억양을 적당한 속도로 들을 수 있습니다(인터넷 연결 필요). 재생이 안 될 경우 버튼이 잠시 붉게 표시되며, 이때는 인터넷 연결을 확인해주세요 — 어색한 기기 음성으로는 대체 재생하지 않습니다. 한글 독음은 실제 발음과 다소 차이가 있을 수 있어 참고용으로만 활용하세요.</p>
+<table class="phrase-table"><thead><tr><th style="width:26%">상황 / 의미</th><th style="width:38%">독일어</th><th>한글 독음</th></tr></thead><tbody><tr><td>안녕하세요</td><td>Guten Tag <button class="spk" data-say="Guten Tag" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">구텐탁</td></tr><tr><td>안녕히 가세요</td><td>Auf Wiedersehen <button class="spk" data-say="Auf Wiedersehen" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">아우프 비더제엔</td></tr><tr><td>감사합니다</td><td>Danke <button class="spk" data-say="Danke" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">당케</td></tr><tr><td>천만에요</td><td>Bitte <button class="spk" data-say="Bitte" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">비테</td></tr><tr><td>죄송합니다 / 실례합니다</td><td>Entschuldigung <button class="spk" data-say="Entschuldigung" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">엔트슐디궁</td></tr><tr><td>네 / 아니오</td><td>Ja / Nein <button class="spk" data-say="Ja / Nein" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">야 / 나인</td></tr><tr><td>영어 하세요?</td><td>Sprechen Sie Englisch? <button class="spk" data-say="Sprechen Sie Englisch?" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">슈프레헨 지 엥글리쉬?</td></tr><tr><td>이거 얼마예요?</td><td>Wie viel kostet das? <button class="spk" data-say="Wie viel kostet das?" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">비 필 코스텟 다스?</td></tr><tr><td>화장실이 어디예요?</td><td>Wo ist die Toilette? <button class="spk" data-say="Wo ist die Toilette?" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">보 이스트 디 토일레테?</td></tr><tr><td>도와주세요</td><td>Helfen Sie mir bitte <button class="spk" data-say="Helfen Sie mir bitte" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">헬펜 지 미어 비테</td></tr><tr><td>물 한 잔 주세요</td><td>Ein Glas Wasser, bitte <button class="spk" data-say="Ein Glas Wasser, bitte" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">아인 글라스 바써 비테</td></tr><tr><td>계산서 주세요</td><td>Die Rechnung, bitte <button class="spk" data-say="Die Rechnung, bitte" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">디 레히눙 비테</td></tr><tr><td>맛있어요</td><td>Es ist lecker <button class="spk" data-say="Es ist lecker" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">에스 이스트 레커</td></tr><tr><td>사진 좀 찍어주시겠어요?</td><td>Könnten Sie ein Foto machen? <button class="spk" data-say="Könnten Sie ein Foto machen?" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">쾬텐 지 아인 포토 마헨?</td></tr><tr><td>예약했어요</td><td>Ich habe eine Reservierung <button class="spk" data-say="Ich habe eine Reservierung" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">이히 하베 아이네 레저비어룽</td></tr><tr><td>여권을 잃어버렸어요</td><td>Ich habe meinen Pass verloren <button class="spk" data-say="Ich habe meinen Pass verloren" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">이히 하베 마이넨 파스 페어로렌</td></tr><tr><td>경찰을 불러주세요</td><td>Rufen Sie bitte die Polizei <button class="spk" data-say="Rufen Sie bitte die Polizei" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">루펜 지 비테 디 폴리차이</td></tr><tr><td>응급상황이에요</td><td>Es ist ein Notfall <button class="spk" data-say="Es ist ein Notfall" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">에스 이스트 아인 노트팔</td></tr><tr><td>병원이 어디예요?</td><td>Wo ist das Krankenhaus? <button class="spk" data-say="Wo ist das Krankenhaus?" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">보 이스트 다스 크랑켄하우스?</td></tr><tr><td>사랑해요</td><td>Ich liebe dich <button class="spk" data-say="Ich liebe dich" data-lang="de" title="발음 듣기">🔊</button></td><td class="small">이히 리베 디히</td></tr></tbody></table>
+</div></div>
+
+</div>
+<div id="emerg" class="day-panel">
+<div class="card">
+<h2>🆘 긴급연락처</h2>
+<div class="alert warn"><b>가장 먼저 기억할 번호</b><br>
+유럽 공통 긴급전화 <b>112</b>(경찰·화재·구급 공통, 무료, 영어 응대 가능) · 대한민국 외교부 <b>영사콜센터 +82-2-3210-0404</b>(24시간, 카카오톡 상담·"해외안전여행" 앱 이용 가능, 여권분실·사건사고·긴급 통역 지원)</div>
+<table class="emerg-table">
+<thead><tr><th style="width:18%">국가</th><th style="width:30%">현지 긴급번호</th><th>대사관 · 참고</th></tr></thead>
+<tbody>
+<tr><td><b>🇫🇷 프랑스</b><br>(파리)</td><td>경찰 17 · 화재 18 · 구급(SAMU) 15 · 공통 112</td><td>주프랑스 대한민국대사관 — <a class="extlink" href="https://fr.mofa.go.kr/fr-ko/wpge/m_9421/contents.do" target="_blank" rel="noopener">공식 홈페이지(주소·전화 확인)</a><br>출국 전 대사관 직통번호를 홈페이지에서 재확인해 저장해두는 것을 권장</td></tr>
+<tr><td><b>🇮🇹 이탈리아</b><br>(돌로미티·베로나)</td><td>경찰(카라비니에리) 112 · 경찰(폴리치아) 113 · 구급 118 · 화재 115</td><td>주이탈리아 대한민국대사관(로마) — <a class="extlink" href="https://it.mofa.go.kr/it-ko/wpge/m_8726/contents.do" target="_blank" rel="noopener">공식 홈페이지(주소·전화 확인)</a><br>밀라노 인근 방문 시 주밀라노 총영사관도 참고</td></tr>
+<tr><td><b>🇦🇹 오스트리아</b><br>(빈)</td><td>경찰 133 · 구급 144 · 화재 122 · 공통 112</td><td>주오스트리아 대한민국대사관 — <a class="extlink" href="https://at.mofa.go.kr/at-ko/wpge/m_8442/contents.do" target="_blank" rel="noopener">공식 홈페이지(주소·전화 확인)</a></td></tr>
+</tbody>
+</table>
+<div class="alert info">
+<b>상황별 체크리스트</b>
+<ul>
+<li><b>여권 분실/도난</b>: 현지 경찰서에서 도난신고확인서(police report) 발급 → 영사콜센터 또는 관할 대사관에 연락해 여행증명서 발급 절차 안내받기</li>
+<li><b>신용카드 분실/도난</b>: 카드사 해외 긴급 분실신고 번호로 즉시 정지(카드 뒷면 또는 앱에서 사전 확인·메모 권장)</li>
+<li><b>사고/도난 피해</b>: 현지 경찰(위 번호)에 신고 후 반드시 신고확인서(리포트) 수령 — 여행자보험 청구 시 필수 서류</li>
+<li><b>의료 응급상황</b>: 위 구급번호로 연락, 여행자보험 가입 시 보험사 해외 응급 지원(어시스턴스) 번호도 함께 메모해둘 것</li>
+</ul>
+</div>
+</div>
+</div>
+
+<footer>본 일정표는 사용자가 최종 확정한 엑셀(PJT.261001-1011)을 기준으로 재구성되었습니다. 항공편·입장권·예약·기온 정보는 출발 전 반드시 각 공식 채널에서 재확인하시기 바랍니다. 장소명을 클릭하면 Google 지도에서 위치를 확인할 수 있습니다.</footer>
+</div>
+<script>
+var _fullLang = {en:'en-US', fr:'fr-FR', it:'it-IT', de:'de-DE', ko:'ko-KR'};
+var _seVoice = {en:'Salli', fr:'Lea', it:'Bianca', de:'Vicki', ko:'Seoyeon'};
+var _ttsAudio = null;
+var _ttsToken = 0;
+var _PLAYBACK_RATE = 0.98;
+
+// Resolves only once real playback has actually begun (the 'playing' event),
+// not merely once the file has loaded — this is the fix for a previous bug
+// where a tier could be marked "successful" before audio.play() had actually
+// been confirmed to work, silently skipping the fallback chain.
+function _tryAudioUrl(label, url, timeoutMs){
+  return new Promise(function(resolve, reject){
+    var audio = new Audio(url);
+    audio.preload = 'auto';
+    var settled = false;
+    function done(fn, arg){ if(settled) return; settled = true; clearTimeout(timer); fn(arg); }
+    var timer = setTimeout(function(){
+      console.warn('[TTS]', label, 'timed out after', timeoutMs, 'ms');
+      try{ audio.pause(); }catch(e){}
+      done(reject, new Error('timeout'));
+    }, timeoutMs);
+    audio.addEventListener('error', function(){
+      var code = audio.error ? audio.error.code : '?';
+      console.warn('[TTS]', label, 'load/network error, code=', code);
+      done(reject, new Error('load-error'));
+    });
+    audio.addEventListener('playing', function(){
+      console.info('[TTS]', label, 'playing OK');
+      audio.playbackRate = _PLAYBACK_RATE;
+      done(resolve, audio);
+    }, {once:true});
+    var p = audio.play();
+    if(p && p.catch){
+      p.catch(function(err){
+        console.warn('[TTS]', label, 'play() rejected:', err && err.name, err && err.message);
+        done(reject, err);
+      });
+    }
+  });
+}
+
+function _speakFallback(text, lang){
+  try{
+    if(!('speechSynthesis' in window)){ console.warn('[TTS] speechSynthesis unavailable'); return false; }
+    var voices = window.speechSynthesis.getVoices() || [];
+    var match = voices.filter(function(v){ return v.lang && v.lang.toLowerCase().replace('_','-').indexOf(lang) === 0; });
+    if(match.length === 0){ console.warn('[TTS] no local voice installed for lang=', lang, '— available:', voices.map(function(v){return v.lang;})); return false; }
+    var pick = match.find(function(v){ return /google|microsoft|natural|neural|online/i.test(v.name); }) || match[0];
+    console.info('[TTS] falling back to device voice:', pick.name, pick.lang);
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = pick.lang || (_fullLang[lang] || lang);
+    u.voice = pick;
+    u.rate = _PLAYBACK_RATE;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+    return true;
+  }catch(e){ console.warn('[TTS] fallback threw:', e); return false; }
+}
+
+function _flashFail(btn){
+  if(!btn) return;
+  var orig = btn.textContent;
+  btn.style.background = '#e57373';
+  btn.textContent = '🔇';
+  setTimeout(function(){ btn.style.background = ''; btn.textContent = orig; }, 1400);
+}
+
+function _playTTS(text, lang, btn){
+  var myToken = ++_ttsToken;
+  if(_ttsAudio){ try{ _ttsAudio.pause(); }catch(e){} }
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  var attempts = [];
+  var seVoice = _seVoice[lang];
+  if(seVoice) attempts.push(['StreamElements(' + seVoice + ')', 'https://api.streamelements.com/kappa/v2/speech?voice=' + seVoice + '&text=' + encodeURIComponent(text)]);
+  attempts.push(['GoogleTranslateTTS', 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=' + encodeURIComponent(lang) + '&q=' + encodeURIComponent(text)]);
+  console.info('[TTS] click:', text, '(' + lang + ')');
+  (function tryNext(i){
+    if(myToken !== _ttsToken) return;
+    if(i >= attempts.length){
+      console.warn('[TTS] all network tiers failed, trying device voice');
+      if(!_speakFallback(text, lang)) _flashFail(btn);
+      return;
+    }
+    var label = attempts[i][0], url = attempts[i][1];
+    _tryAudioUrl(label, url, 5000).then(function(audio){
+      if(myToken !== _ttsToken){ try{ audio.pause(); }catch(e){} return; }
+      _ttsAudio = audio;
+    }).catch(function(){ tryNext(i+1); });
+  })(0);
+}
+
+if('speechSynthesis' in window){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
+}
+document.querySelectorAll('.spk').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    _playTTS(btn.dataset.say, btn.dataset.lang, btn);
+  });
+});
+
+// ---- 통역 (양방향 대화 모드): 번역 + 대화기록 + 마이크(한국어 / 상대방 언어) ----
+var _RECOG_LOCALE = {ko:'ko-KR', en:'en-US', fr:'fr-FR', it:'it-IT', de:'de-DE'};
+var _LANG_LABEL = {en:'영어', fr:'프랑스어', it:'이탈리아어', de:'독일어'};
+var _dialogRecognition = null;
+var _dialogRecognizing = false;
+
+async function _translateText(text, sl, tl){
+  var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + encodeURIComponent(sl) + '&tl=' + encodeURIComponent(tl) + '&dt=t&q=' + encodeURIComponent(text);
+  var res = await fetch(url);
+  if(!res.ok) throw new Error('http ' + res.status);
+  var data = await res.json();
+  var translated = (data && data[0]) ? data[0].map(function(seg){ return seg[0] || ''; }).join('') : '';
+  if(!translated) throw new Error('empty translation');
+  return translated;
+}
+
+function _addLogEntry(who, speakerLabel, originalText, translatedText, playLang){
+  var log = document.getElementById('transLog');
+  if(!log) return;
+  var entry = document.createElement('div');
+  entry.className = 'trans-log-entry ' + who;
+  var head = document.createElement('div');
+  head.className = 'trans-log-speaker';
+  head.textContent = speakerLabel;
+  var orig = document.createElement('div');
+  orig.className = 'trans-log-orig';
+  orig.textContent = originalText;
+  var trRow = document.createElement('div');
+  trRow.className = 'trans-log-translated';
+  var trText = document.createElement('span');
+  trText.textContent = translatedText;
+  var spkBtn = document.createElement('button');
+  spkBtn.className = 'spk';
+  spkBtn.title = '발음 듣기';
+  spkBtn.textContent = '🔊';
+  spkBtn.addEventListener('click', function(){ _playTTS(translatedText, playLang, spkBtn); });
+  trRow.appendChild(trText);
+  trRow.appendChild(spkBtn);
+  entry.appendChild(head);
+  entry.appendChild(orig);
+  entry.appendChild(trRow);
+  log.insertBefore(entry, log.firstChild);
+}
+
+async function _doTranslate(){
+  var inputEl = document.getElementById('transInput');
+  var langEl = document.getElementById('transLang');
+  var outEl = document.getElementById('transOutput');
+  var btnEl = document.getElementById('transBtn');
+  if(!inputEl || !langEl || !outEl || !btnEl) return;
+  var text = inputEl.value.trim();
+  var lang = langEl.value;
+  if(!text){ outEl.textContent = '먼저 한국어 문장을 입력해주세요.'; return; }
+  outEl.textContent = '번역 중...';
+  btnEl.disabled = true;
+  try{
+    var translated = await _translateText(text, 'ko', lang);
+    outEl.textContent = '';
+    console.info('[번역]', text, '->', translated, '(' + lang + ')');
+    _addLogEntry('me', '나 (한국어)', text, translated, lang);
+    _playTTS(translated, lang, null);
+    inputEl.value = '';
+  }catch(e){
+    console.warn('[번역] 실패:', e);
+    outEl.textContent = '번역에 실패했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.';
+  }finally{
+    btnEl.disabled = false;
+  }
+}
+var _transBtnEl = document.getElementById('transBtn');
+if(_transBtnEl){
+  _transBtnEl.addEventListener('click', _doTranslate);
+  var _transInputEl = document.getElementById('transInput');
+  if(_transInputEl){
+    _transInputEl.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); _doTranslate(); }
+    });
+  }
+}
+
+var _transClearEl = document.getElementById('transClear');
+if(_transClearEl){
+  _transClearEl.addEventListener('click', function(){
+    var log = document.getElementById('transLog');
+    if(log) log.innerHTML = '';
+    var outEl = document.getElementById('transOutput');
+    if(outEl) outEl.textContent = '대화 기록을 지웠습니다.';
+  });
+}
+
+var _transLangSelEl = document.getElementById('transLang');
+var _transMicForeignLabelEl = document.getElementById('transMicForeignLabel');
+function _updateForeignMicLabel(){
+  if(_transLangSelEl && _transMicForeignLabelEl){
+    _transMicForeignLabelEl.textContent = '상대방 (' + (_LANG_LABEL[_transLangSelEl.value] || '') + ')';
+  }
+}
+if(_transLangSelEl){
+  _transLangSelEl.addEventListener('change', _updateForeignMicLabel);
+  _updateForeignMicLabel();
+}
+
+// direction: 'ko2foreign' (내가 한국어로 말함) 또는 'foreign2ko' (상대방이 선택된 언어로 말함)
+function _startDialogTurn(direction){
+  var outEl = document.getElementById('transOutput');
+  var micKoBtn = document.getElementById('transMicKo');
+  var micFxBtn = document.getElementById('transMicForeign');
+  var langSel = document.getElementById('transLang');
+  if(!outEl || !micKoBtn || !micFxBtn || !langSel) return;
+  var activeBtn = direction === 'ko2foreign' ? micKoBtn : micFxBtn;
+  var otherBtn = direction === 'ko2foreign' ? micFxBtn : micKoBtn;
+
+  if(_dialogRecognizing){
+    if(_dialogRecognition){ try{ _dialogRecognition.stop(); }catch(e){} }
+    return;
+  }
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    outEl.textContent = '이 브라우저는 음성 인식을 지원하지 않습니다. Chrome 또는 Edge 브라우저를 이용해주세요.';
+    return;
+  }
+  var foreignLang = langSel.value;
+  var srcLang = direction === 'ko2foreign' ? 'ko' : foreignLang;
+  var tgtLang = direction === 'ko2foreign' ? foreignLang : 'ko';
+  var speakerLabel = direction === 'ko2foreign' ? '나 (한국어)' : '상대방 (' + (_LANG_LABEL[foreignLang] || '') + ')';
+  var who = direction === 'ko2foreign' ? 'me' : 'other';
+
+  _dialogRecognition = new SR();
+  _dialogRecognition.lang = _RECOG_LOCALE[srcLang] || 'en-US';
+  _dialogRecognition.continuous = false;
+  _dialogRecognition.interimResults = true;
+  _dialogRecognition.maxAlternatives = 1;
+  _dialogRecognizing = true;
+  activeBtn.classList.add('listening');
+  otherBtn.disabled = true;
+  outEl.textContent = '🎤 듣고 있습니다...';
+  var finalText = '';
+  _dialogRecognition.addEventListener('result', function(e){
+    var t = '';
+    for(var i = 0; i < e.results.length; i++){ t += e.results[i][0].transcript; }
+    finalText = t;
+    outEl.textContent = '🎤 ' + t;
+  });
+  _dialogRecognition.addEventListener('error', function(e){
+    console.warn('[음성인식] 오류:', e.error);
+    if(e.error === 'no-speech'){ outEl.textContent = '음성이 감지되지 않았습니다. 다시 시도해주세요.'; }
+    else if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){ outEl.textContent = '마이크 권한이 필요합니다. 브라우저 주소창의 마이크 아이콘에서 접근을 허용해주세요.'; }
+    else{ outEl.textContent = '음성 인식 중 오류가 발생했습니다 (' + e.error + ').'; }
+  });
+  _dialogRecognition.addEventListener('end', async function(){
+    _dialogRecognizing = false;
+    activeBtn.classList.remove('listening');
+    otherBtn.disabled = false;
+    var text = finalText.trim();
+    if(!text) return;
+    outEl.textContent = '번역 중...';
+    try{
+      var translated = await _translateText(text, srcLang, tgtLang);
+      outEl.textContent = '';
+      console.info('[대화]', speakerLabel, ':', text, '->', translated, '(' + tgtLang + ')');
+      _addLogEntry(who, speakerLabel, text, translated, tgtLang);
+      _playTTS(translated, tgtLang, null);
+    }catch(err){
+      console.warn('[대화] 번역 실패:', err);
+      outEl.textContent = '번역에 실패했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.';
+    }
+  });
+  try{
+    _dialogRecognition.start();
+  }catch(e){
+    _dialogRecognizing = false;
+    activeBtn.classList.remove('listening');
+    otherBtn.disabled = false;
+    outEl.textContent = '음성 인식을 시작할 수 없습니다.';
+  }
+}
+
+var _micKoEl = document.getElementById('transMicKo');
+var _micFxEl = document.getElementById('transMicForeign');
+var _hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+[_micKoEl, _micFxEl].forEach(function(btn){
+  if(!btn) return;
+  if(!_hasSR){
+    btn.disabled = true;
+    btn.title = '이 브라우저는 음성 인식을 지원하지 않습니다 (Chrome/Edge 권장)';
+  }
+});
+if(_micKoEl) _micKoEl.addEventListener('click', function(){ _startDialogTurn('ko2foreign'); });
+if(_micFxEl) _micFxEl.addEventListener('click', function(){ _startDialogTurn('foreign2ko'); });
+
+// ---- Sub-tabs inside the 통역 tab (영어/프랑스어/이탈리아어/독일어 phrasebook pages) ----
+document.querySelectorAll('.lang-tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.lang-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.lang-panel').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.langTab).classList.add('active');
+  });
+});
+const buttons=document.querySelectorAll('.tab-btn');
+const panels=document.querySelectorAll('.day-panel');
+buttons.forEach(btn=>{
+ btn.addEventListener('click',()=>{
+   buttons.forEach(b=>b.classList.remove('active'));
+   panels.forEach(p=>p.classList.remove('active'));
+   btn.classList.add('active');
+   document.getElementById(btn.dataset.tab).classList.add('active');
+   window.scrollTo({top:0,behavior:'smooth'});
+ });
+});
+
+// ---- 실시간 날씨(Open-Meteo, API 키 불필요) ----
+var _WEATHER_DAYS = [{"id": "d1", "date": "2026-10-01", "locs": [{"name": "인천", "lat": 37.4691, "lon": 126.4505}]}, {"id": "d2", "date": "2026-10-02", "locs": [{"name": "파리", "lat": 48.8566, "lon": 2.3522}]}, {"id": "d3", "date": "2026-10-03", "locs": [{"name": "파리", "lat": 48.8566, "lon": 2.3522}]}, {"id": "d4", "date": "2026-10-04", "locs": [{"name": "파리", "lat": 48.8566, "lon": 2.3522}]}, {"id": "d5", "date": "2026-10-05", "locs": [{"name": "파리", "lat": 48.8566, "lon": 2.3522}, {"name": "폴리나", "lat": 45.9333, "lon": 12.1333}]}, {"id": "d6", "date": "2026-10-06", "locs": [{"name": "트레치메", "lat": 46.6096, "lon": 12.3036}, {"name": "오르티세이", "lat": 46.5773, "lon": 11.6763}]}, {"id": "d7", "date": "2026-10-07", "locs": [{"name": "오르티세이", "lat": 46.5773, "lon": 11.6763}]}, {"id": "d8", "date": "2026-10-08", "locs": [{"name": "리모네", "lat": 45.8092, "lon": 10.7889}, {"name": "베로나", "lat": 45.4384, "lon": 10.9916}]}, {"id": "d9", "date": "2026-10-09", "locs": [{"name": "베로나", "lat": 45.4384, "lon": 10.9916}, {"name": "빈", "lat": 48.2082, "lon": 16.3738}]}, {"id": "d10", "date": "2026-10-10", "locs": [{"name": "빈", "lat": 48.2082, "lon": 16.3738}]}, {"id": "d11", "date": "2026-10-11", "locs": [{"name": "빈", "lat": 48.2082, "lon": 16.3738}]}, {"id": "d12", "date": "2026-10-12", "locs": [{"name": "인천", "lat": 37.4691, "lon": 126.4505}]}];
+var _WX_LABEL = {0:['맑음','☀️'],1:['대체로 맑음','🌤️'],2:['구름 조금','⛅'],3:['흐림','☁️'],45:['안개','🌫️'],48:['짙은 안개','🌫️'],51:['약한 이슬비','🌦️'],53:['이슬비','🌦️'],55:['강한 이슬비','🌧️'],56:['어는 이슬비','🌧️'],57:['강한 어는 이슬비','🌧️'],61:['약한 비','🌦️'],63:['비','🌧️'],65:['강한 비','🌧️'],66:['어는 비','🌧️'],67:['강한 어는 비','🌧️'],71:['약한 눈','🌨️'],73:['눈','🌨️'],75:['강한 눈','❄️'],77:['싸락눈','🌨️'],80:['약한 소나기','🌦️'],81:['소나기','🌦️'],82:['강한 소나기','⛈️'],85:['소낙눈','🌨️'],86:['강한 소낙눈','🌨️'],95:['뇌우','⛈️'],96:['우박 동반 뇌우','⛈️'],99:['강한 우박 동반 뇌우','⛈️']};
+var WEATHER_CACHE_KEY = 'pjt2610_weather_cache_v1';
+var WEATHER_CACHE_TTL_MS = 3*60*60*1000;
+
+function _wxLabel(code){
+  var e = _WX_LABEL[code];
+  return e ? (e[1]+' '+e[0]) : '';
+}
+
+function _wxPoints(){
+  var seen = {}, pts = [];
+  _WEATHER_DAYS.forEach(function(day){
+    day.locs.forEach(function(loc){
+      var key = loc.lat.toFixed(3)+','+loc.lon.toFixed(3);
+      if(!(key in seen)){ seen[key] = pts.length; pts.push({lat:loc.lat, lon:loc.lon}); }
+    });
+  });
+  return {points:pts, index:seen};
+}
+
+async function _fetchLiveWeatherRaw(){
+  var pts = _wxPoints().points;
+  var lat = pts.map(function(p){ return p.lat; }).join(',');
+  var lon = pts.map(function(p){ return p.lon; }).join(',');
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=16';
+  var res = await fetch(url);
+  if(!res.ok) throw new Error('http '+res.status);
+  var data = await res.json();
+  return Array.isArray(data) ? data : [data];
+}
+
+function _applyWeatherData(results){
+  var idx = _wxPoints().index;
+  var anyLive = false;
+  _WEATHER_DAYS.forEach(function(day){
+    day.locs.forEach(function(loc, i){
+      var key = loc.lat.toFixed(3)+','+loc.lon.toFixed(3);
+      var pointIdx = idx[key];
+      var fc = results[pointIdx];
+      var dayIdx = (fc && fc.daily && fc.daily.time) ? fc.daily.time.indexOf(day.date) : -1;
+      if(dayIdx < 0) return;
+      var hi = Math.round(fc.daily.temperature_2m_max[dayIdx]);
+      var lo = Math.round(fc.daily.temperature_2m_min[dayIdx]);
+      var code = fc.daily.weather_code[dayIdx];
+      var label = _wxLabel(code);
+      var elTemp = document.getElementById('wxTemp-'+day.id+'-'+i);
+      var elCond = document.getElementById('wxCond-'+day.id+'-'+i);
+      var elHiM = document.getElementById('wxTempHi-'+day.id+'-'+i);
+      var elLoM = document.getElementById('wxTempLo-'+day.id+'-'+i);
+      var elCondM = document.getElementById('wxCondM-'+day.id+'-'+i);
+      if(elTemp) elTemp.textContent = hi+'/'+lo+'°C';
+      if(elCond) elCond.textContent = label ? (label+' ') : '';
+      if(elHiM) elHiM.textContent = hi;
+      if(elLoM) elLoM.textContent = lo;
+      if(elCondM) elCondM.textContent = label;
+      anyLive = true;
+    });
+  });
+  var stamp = document.getElementById('wxUpdatedStamp');
+  if(stamp){
+    var now = new Date();
+    var timeStr = now.toLocaleString('ko-KR', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
+    stamp.textContent = anyLive
+      ? ('🔄 마지막 실시간 갱신: ' + timeStr + ' (16일 이내 날짜만 실시간 반영, 그 외는 사전 예상치)')
+      : ('아직 실시간 예보 범위(16일 이내)에 들어온 날짜가 없습니다 — 사전 예상치 표시 중 (확인: ' + timeStr + ')');
+  }
+}
+
+async function _refreshWeather(force){
+  var stamp = document.getElementById('wxUpdatedStamp');
+  try{
+    if(!force){
+      var cached = null;
+      try{ cached = JSON.parse(localStorage.getItem(WEATHER_CACHE_KEY)); }catch(e){}
+      if(cached && cached.data && (Date.now() - cached.ts) < WEATHER_CACHE_TTL_MS){
+        _applyWeatherData(cached.data);
+        return;
+      }
+    }
+    var results = await _fetchLiveWeatherRaw();
+    try{ localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({ts:Date.now(), data:results})); }catch(e){}
+    _applyWeatherData(results);
+  }catch(err){
+    console.warn('[날씨] 실시간 예보를 불러오지 못했습니다(오프라인이거나 API 문제) — 사전 예상치를 유지합니다:', err);
+    if(stamp) stamp.textContent = '🔌 실시간 날씨를 불러오지 못했습니다 (인터넷 연결을 확인하세요 · 사전 예상치 표시 중)';
+  }
+}
+
+_refreshWeather(false);
+var _wxRefreshBtn = document.getElementById('wxRefreshBtn');
+if(_wxRefreshBtn) _wxRefreshBtn.addEventListener('click', function(){ _refreshWeather(true); });
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').then(function(reg){
+      console.info('[PWA] service worker registered:', reg.scope);
+    }).catch(function(err){
+      console.warn('[PWA] service worker registration failed (파일을 file://로 직접 열었거나 http 서버가 아니면 정상적으로 실패합니다):', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
